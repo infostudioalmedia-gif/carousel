@@ -19,6 +19,8 @@ class H(BaseHTTPRequestHandler):
         except Exception: pw = ''
         if hmac.compare_digest(pw.encode(), PASSWORD.encode()): return True
         self.send_response(401); self.send_header('WWW-Authenticate', 'Basic realm="Rooya Carousel"'); self.send_header('Content-Length', '0'); self.end_headers(); return False
+    def is_local(self):
+        return not (self.headers.get('X-Forwarded-For') or self.headers.get('Tailscale-User-Login') or self.headers.get('X-Forwarded-Host'))
     def send_json(self, obj, code=200):
         b = json.dumps(obj, ensure_ascii=False).encode('utf-8')
         self.send_response(code); self.send_header('Content-Type', 'application/json; charset=utf-8')
@@ -58,15 +60,28 @@ class H(BaseHTTPRequestHandler):
             # تلقائيًا: لو الـ storyboard اتكتب بعد الانتظار → كمّل التجهيز
             if j['status'] == 'needs_storyboard' and (P.jdir(jid) / 'storyboard.json').exists():
                 j['status'] = 'analyzing'; P.save(j); P.start(P.prepare, jid)
-            imgs = P.jdir(jid) / 'images'
-            j['uploaded'] = sorted({q.stem for q in imgs.glob('*.*') if q.suffix.lower() in P.IMG_EXT}) if imgs.is_dir() else []
-            j['uploaded_files'] = {q.stem: q.name for q in sorted(imgs.glob('*.*')) if q.suffix.lower() in P.IMG_EXT} if imgs.is_dir() else {}
+            up = {}
+            try:
+                if j.get('slots'):
+                    for s in j['slots']:
+                        f = P.find_insert(j, s['id'])
+                        if f: up[s['id']] = f
+            except Exception: pass
+            j['uploaded'] = sorted(up)
+            j['uploaded_urls'] = {sid: (('/inserts/%s/%s' if f.parent.name == P.SUBDIRS['inserts'] else '/files/%s/images/%s') % (jid, urllib.parse.quote(f.name))) + '?v=%d' % int(f.stat().st_mtime) for sid, f in up.items()}
+            j['inserts_dir'] = str(P.inserts_dir(j)) if j.get('project_dir') else ''
             j['now'] = time.time(); return self.send_json(j)
         m = re.match(r'^/fonts/([\w.-]+\.(?:ttf|otf))$', path)
         if m: return self.serve_file(P.STYLES_DIR / 'november' / 'template' / 'fonts' / m.group(1))
         if path == '/logo.png': return self.serve_file(P.STYLES_DIR / 'november' / 'template' / 'ui-logo-navy.png')
         m = re.match(r'^/styles/([\w-]+)/thumb$', path)
         if m: return self.serve_file(P.STYLES_DIR / m.group(1) / 'thumb.jpg')
+        m = re.match(r'^/inserts/([\w-]+)/(.+)$', path)
+        if m:
+            if not (P.jdir(m.group(1)) / 'job.json').exists(): return self.send_json({'error': 'not found'}, 404)
+            jj = P.load(m.group(1)); base = P.inserts_dir(jj).resolve(); p = (base / m.group(2)).resolve()
+            if base not in p.parents: return self.send_json({'error': 'forbidden'}, 403)
+            return self.serve_file(p)
         m = re.match(r'^/files/([\w-]+)/(.+)$', path)
         if m:
             base = P.jdir(m.group(1)).resolve(); p = (base / m.group(2)).resolve()
@@ -83,29 +98,50 @@ class H(BaseHTTPRequestHandler):
                 job = P.new_job(name, q.get('style', [None])[0], int(q['slides'][0]) if q.get('slides', [''])[0].isdigit() else None); ext = os.path.splitext(fn)[1].lower() or '.bin'
                 self.save_body(P.jdir(job['id']) / ('input' + ext))
                 job['input'] = {'type': 'file', 'name': fn}; P.save(job); P.start(P.analyze, job['id']); return self.send_json({'id': job['id']})
+            if path == '/api/pickfolder':
+                if not self.is_local(): return self.send_json({'error': 'اختيار الفولدر متاح من الجهاز نفسه بس — اكتب المسار يدويًا'}, 403)
+                import subprocess, sys
+                code = ("import tkinter as t; from tkinter import filedialog as f; r=t.Tk(); r.withdraw(); r.attributes('-topmost',True); "
+                        "p=f.askdirectory(title='اختر المكان اللي يتحفظ فيه فولدر المشروع'); print(p or '')")
+                try: out = subprocess.run([sys.executable, '-c', code], capture_output=True, text=True, encoding='utf-8', timeout=300).stdout.strip()
+                except Exception as ex: return self.send_json({'error': str(ex)}, 500)
+                return self.send_json({'path': out.replace('/', os.sep)})
             if path == '/api/jobs/new-url':
-                b = self.body_json(); job = P.new_job(b.get('name', ''), b.get('style'), int(b['slides']) if str(b.get('slides', '')).isdigit() else None)
-                u0 = P.clean_path(b['url'])
+                b = self.body_json(); u0 = P.clean_path(b['url'])
+                if re.match(r'^([A-Za-z]:[\\/]|\\\\)', u0) and not P.is_local_file(u0):
+                    return self.send_json({'error': 'ده مسار ملف على جهازك مش على السيرفر، فالسيرفر مايقدرش يوصله. اضغط «ارفع صوت أو فيديو» واختار الملف من جهازك، وسيب خانة الرابط فاضية (الخانة دي للروابط أو لمسار ملف على جهاز السيرفر نفسه).'}, 400)
+                job = P.new_job(b.get('name', ''), b.get('style'), int(b['slides']) if str(b.get('slides', '')).isdigit() else None)
                 job['input'] = {'type': 'path', 'path': u0} if P.is_local_file(u0) else {'type': 'url', 'url': u0}; P.save(job); P.start(P.analyze, job['id']); return self.send_json({'id': job['id']})
-            m = re.match(r'^/api/jobs/([\w-]+)/(upload|update|finish|retry|slides|source_text|restart)$', path)
+            m = re.match(r'^/api/jobs/([\w-]+)/(upload|update|finish|retry|slides|source_text|restart|reprompt|open_project|goto)$', path)
             if m:
                 jid, act = m.groups(); job = P.load(jid)
                 if act == 'upload':
                     slot = q.get('slot', [''])[0]; fn = urllib.parse.unquote(q.get('filename', ['x.jpg'])[0])
                     ext = os.path.splitext(fn)[1].lower()
                     if ext not in P.IMG_EXT: return self.send_json({'error': 'صيغة غير مدعومة'}, 400)
-                    for old in (P.jdir(jid) / 'images').glob(slot + '.*'): old.unlink()
-                    self.save_body(P.jdir(jid) / 'images' / (slot + ext)); return self.send_json({'ok': True})
+                    if not re.match(r'^s\d+$', slot): return self.send_json({'error': 'خانة غير صحيحة'}, 400)
+                    tmp = P.jdir(jid) / ('upload-%s%s' % (slot, ext)); self.save_body(tmp)
+                    try: dst = P.save_insert(job, slot, tmp, ext)
+                    finally:
+                        try: tmp.unlink()
+                        except OSError: pass
+                    return self.send_json({'ok': True, 'saved_as': dst.name, 'folder': str(dst.parent)})
                 if act == 'update':
                     b = self.body_json()
                     if 'storyboard' in b: job['storyboard'] = b['storyboard']
                     restyle = 'style' in b and b['style'] != job.get('style')
-                    for k in ('choices', 'folder', 'out', 'style'):
+                    for k in ('choices', 'folder', 'style'):
                         if k in b: job[k] = b[k]
+                    if 'out' in b:
+                        nb = (b['out'] or '').strip().strip('"')
+                        if nb and os.path.normcase(os.path.abspath(nb)) != os.path.normcase(job.get('project_base') or ''):
+                            try: P.move_project(job, nb)
+                            except Exception as ex: return self.send_json({'error': 'تعذّر نقل المشروع: %s' % ex}, 500)
+                        elif not nb: job['out'] = ''
                     if restyle: job['status'] = 'analyzing'
                     P.save(job)
                     if restyle: P.start(P.prepare, jid)      # يعيد البرومبتات والتصميم المبدئي بالنمط الجديد
-                    return self.send_json({'ok': True})
+                    return self.send_json({'ok': True, 'project_dir': job.get('project_dir')})
                 if act == 'finish':
                     job['status'] = 'rendering'; P.save(job); P.start(P.finish, jid); return self.send_json({'ok': True})
                 if act == 'slides':
@@ -130,6 +166,21 @@ class H(BaseHTTPRequestHandler):
                     else:
                         job['slides_suggest'] = P.suggest_slides(job); job['status'] = 'awaiting_slides'; P.save(job)
                     return self.send_json({'ok': True})
+                if act == 'reprompt':
+                    b = self.body_json()
+                    try: s = P.regen_prompt(jid, b.get('slot', ''))
+                    except Exception as ex:
+                        m = str(ex); m = ('Gemini مشغول دلوقتي (ضغط على الخدمة) — جرّب تاني بعد شوية' if ('503' in m or 'high demand' in m) else ('انتهت مهلة التوليد — جرّب تاني' if 'timed out' in m.lower() else m.splitlines()[0][:300]))
+                        return self.send_json({'error': m}, 422)
+                    return self.send_json({'ok': True, 'slot': s})
+                if act == 'open_project':
+                    if not self.is_local(): return self.send_json({'error': 'فتح الفولدر متاح من الجهاز نفسه بس'}, 403)
+                    pd = P.project_dir(job); os.startfile(str(pd)); return self.send_json({'ok': True, 'path': str(pd)})
+                if act == 'goto':
+                    b = self.body_json()
+                    try: nm = P.goto_stage(jid, b.get('stage', -1))
+                    except ValueError as ex: return self.send_json({'error': str(ex)}, 409)
+                    return self.send_json({'ok': True, 'stage': nm})
                 if act == 'restart':
                     if job.get('status') in ('received', 'analyzing', 'rendering'): return self.send_json({'error': 'الكاروسيل شغّال دلوقتي'}, 409)
                     P.reset_job(jid); P.start(P.analyze, jid); return self.send_json({'ok': True})

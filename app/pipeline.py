@@ -37,7 +37,7 @@ def jdir(jid): return JOBS / jid
 def load(jid):
     p = jdir(jid) / 'job.json'; last = None
     for _ in range(8):                      # ويندوز: ملف ممكن يتقفل لحظات (قراءة متزامنة/أنتي فيرس)
-        try: return json.loads(p.read_text(encoding='utf-8'))
+        try: return json.loads(p.read_text(encoding='utf-8-sig'))
         except (OSError, ValueError) as ex: last = ex; time.sleep(0.15)
     raise last
 def save(job):
@@ -96,6 +96,99 @@ def recover():
             if j.get('status') in ('received', 'analyzing', 'rendering'):
                 j['status'] = 'failed'; j['error'] = 'انقطعت العملية (إعادة تشغيل السيرفر) — اضغط إعادة المحاولة'; end_plan(j); save(j)
 
+# ------------------------------------------------------------------ فولدر المشروع (جنب المصدر) + الانسرتات بأسماء الشرايح
+SUBDIRS = {'inserts': 'الانسرتات', 'slides': 'الشرايح', 'files': 'ملفات'}
+MARK = '.rooya-job'
+
+def safe_name(s, default='project'):
+    s = re.sub(r'[\\/:*?"<>|\r\n]+', ' ', str(s or '')).strip(' .')
+    return (re.sub(r'\s+', ' ', s) or default)[:80]
+
+def default_base(job):
+    inp = job.get('input') or {}
+    if inp.get('type') == 'path' and inp.get('path'):
+        return Path(clean_path(inp['path'])).parent                       # نفس مكان المصدر
+    return Path(CFG.get('default_out_dir') or (Path.home() / 'Downloads' / 'Rooya Carousels'))
+
+def _owned(p, jid):
+    m = p / MARK
+    if m.exists():
+        try: return m.read_text(encoding='utf-8').strip() == jid
+        except OSError: return False
+    return not any(p.iterdir()) if p.exists() else True
+
+def init_project(job, base=None):
+    """يحدد فولدر المشروع (جنب المصدر افتراضيًا) ويعمل الفولدرات الفرعية جنب بعض، ويتأكد إنه قابل للكتابة. بيرجّع المسار."""
+    jid = job['id']; base = Path(base) if base else (Path(job['out']) if job.get('out') else default_base(job))
+    name = safe_name(job.get('name') or jid, jid); cand = base / name; n = 1
+    while cand.exists() and not _owned(cand, jid):
+        n += 1; cand = base / ('%s (%d)' % (name, n))
+    try:
+        for sub in SUBDIRS.values(): (cand / sub).mkdir(parents=True, exist_ok=True)
+        (cand / MARK).write_text(jid, encoding='utf-8')
+        t = cand / '.write-test'; t.write_text('ok'); t.unlink()
+    except OSError as ex:
+        logj(job, '⚠ تعذّر الكتابة في %s (%s) — هستخدم فولدر داخلي' % (cand, ex))
+        cand = jdir(jid) / 'project'
+        for sub in SUBDIRS.values(): (cand / sub).mkdir(parents=True, exist_ok=True)
+    job['project_dir'] = str(cand); job['project_base'] = str(cand.parent)
+    return cand
+
+def migrate_legacy(job):
+    """صور اتحفظت قبل كده جوه فولدر الكاروسيل الداخلي (images/sN.jpg) تتنقل لفولدر الانسرتات بأسماء الشرايح."""
+    imgs = jdir(job['id']) / 'images'
+    if not (imgs.is_dir() and job.get('slots')): return
+    for f in list(imgs.glob('s*.*')):
+        if f.suffix.lower() in IMG_EXT and re.match(r'^s\d+$', f.stem) and any(s['id'] == f.stem for s in job['slots']):
+            try: save_insert(job, f.stem, f, f.suffix)
+            except Exception: pass
+
+def project_dir(job):
+    if not job.get('project_dir') or not Path(job['project_dir']).exists():
+        init_project(job); migrate_legacy(job); save(job)
+    return Path(job['project_dir'])
+
+def move_project(job, new_base):
+    """تغيير مكان المشروع: بيعمل الفولدرات في المكان الجديد وينسخ اللي فيها (القديم بيفضل كما هو)."""
+    old = Path(job['project_dir']) if job.get('project_dir') else None
+    new = init_project(job, new_base); job['out'] = str(new_base)
+    if old and old.exists() and old.resolve() != new.resolve():
+        shutil.copytree(old, new, dirs_exist_ok=True); logj(job, '📁 اتنقل المشروع إلى: %s (النسخة القديمة لسه موجودة في: %s)' % (new, old))
+    return new
+
+def slide_no(sid): return int(str(sid)[1:]) + 1
+
+def slot_title(job, sid):
+    for s in job.get('slots') or []:
+        if s['id'] == sid: return safe_name(str(s.get('label', '')).split('—')[-1].strip(), 'slide')
+    return 'slide'
+
+def inserts_dir(job): return project_dir(job) / SUBDIRS['inserts']
+
+def find_insert(job, sid):
+    """أحدث صورة باسم الشريحة (slide-03 ...) في فولدر الانسرتات، أو أقدم صورة مرفوعة داخل فولدر الكاروسيل الداخلي."""
+    d = (Path(job['project_dir']) / SUBDIRS['inserts']) if job.get('project_dir') else None; pre = 'slide-%02d' % slide_no(sid)
+    hits = [p for p in d.iterdir() if p.suffix.lower() in IMG_EXT and (p.stem == pre or p.stem.startswith(pre + '_') or p.stem.startswith(pre + ' '))] if (d and d.exists()) else []
+    if hits: return max(hits, key=lambda p: p.stat().st_mtime)
+    return next((p for p in (jdir(job['id']) / 'images').glob(sid + '.*') if p.suffix.lower() in IMG_EXT), None)
+
+def save_insert(job, sid, src, ext=None):
+    """يحفظ صورة الخانة في فولدر الانسرتات باسم الشريحة (slide-03_التسخين.jpg) ويشيل أي نسخة قديمة لنفس الشريحة."""
+    d = inserts_dir(job); pre = 'slide-%02d' % slide_no(sid); ext = (ext or Path(src).suffix).lower()
+    dst = d / ('%s_%s%s' % (pre, slot_title(job, sid), ext))
+    tmp = d / ('.tmp-%s%s' % (uuid.uuid4().hex[:6], ext))
+    if str(src) != str(dst): shutil.copyfile(src, tmp) if not isinstance(src, bytes) else tmp.write_bytes(src)
+    else: return dst
+    for old in d.iterdir():
+        if old.suffix.lower() in IMG_EXT and (old.stem == pre or old.stem.startswith(pre + '_') or old.stem.startswith(pre + ' ')): old.unlink()
+    for _ in range(8):
+        try: os.replace(tmp, dst); break
+        except OSError: time.sleep(0.3)
+    for old in (jdir(job['id']) / 'images').glob(sid + '.*'):
+        try: old.unlink()
+        except OSError: pass
+    return dst
+
 # ------------------------------------------------------------------ مرحلة 1: التحليل
 def read_key(path):
     txt = open(path, encoding='utf-8-sig').read()
@@ -130,16 +223,19 @@ STORYBOARD_SPEC = '''أنت مصمّم محتوى لشركة «رؤية لحلو
 - الغلاف: تسلسل قراءة من الأكبر للأصغر: a (الكلمة الأقوى، قصيرة) ثم b (جملة أقصر من 20 حرفًا) ثم c. "accent" كلمة/رقم داخل b يتلون.
 - عناوين الكروت سطران كحد أقصى، كل سطر 3–4 كلمات. النص p لا يزيد عن 3 أسطر (حوالي 110 حرفًا). **نص** = كلمات بخط ثقيل.
 - كل شريحة لها "tab": {"ar": كلمة واحدة, "en": كلمة إنجليزية}.
-- لكل شريحة صورة: "image": {"prompt": وصف إنجليزي قصير للمشهد/الموضوع فقط (إيه اللي في الصورة: المعدات، الحدث، المنتج) من موضوع التفريغ؛ **ماتذكرش الأسلوب ولا الإضاءة ولا الألوان** لأن نمط رؤية بيتضاف تلقائيًا (واقعي، ألوان طبيعية، بدون نصوص أو وجوه), "at": ثانية في التفريغ ذات صلة (لو مفيش فيديو اتركها null)}.
+- لكل شريحة صورة: "image": {"prompt": ..., "scene_ar": ..., "at": ...}.
+  • **prompt** = وصف إنجليزي **مفصّل وطويل (من 70 إلى 120 كلمة)** للمشهد اللي المتحدث بيشرحه في الجزء ده من الفيديو بالظبط، يشمل: المرحلة أو العملية (إيه اللي بيحصل فيها وبعدها إيه)، المعدة أو المادة بأجزائها وتفاصيلها المذكورة في الكلام (الخامة، العدد، الشكل، مكانها)، الحركة أو الإجراء الجاري، موضع الكاميرا وزاوية اللقطة وقربها، وتفاصيل البيئة المحيطة. اكتبه كأنك بتوصف لمصوّر مشهد واحد محدد من الفيديو. **ممنوع** تضيف معدات أو أرقام أو معلومات مش موجودة في التفريغ، و**ماتذكرش الأسلوب ولا الإضاءة ولا الألوان** لأن نمط رؤية بيتضاف تلقائيًا (واقعي، ألوان طبيعية، بدون نصوص أو وجوه).
+  • **scene_ar** = سطر أو سطرين بالعربي: أنهي مرحلة/جزء من الفيديو الصورة دي بتمثله وإيه الكلام اللي بتعبّر عنه.
+  • **at** = ثانية في التفريغ ذات صلة (لو مفيش فيديو اتركها null).
 - ممنوع روابط على الشرايح.
 أخرج JSON فقط بهذا الشكل:
 {
  "title": "اسم قصير للكاروسيل",
- "cover": {"a": "...", "b": "...", "accent": "...", "c": "...", "strip": ["...","...","..."], "sticker": "calc|cal|none", "src": "اقتباس حرفي من التفريغ", "image": {"prompt": "...", "at": 5}},
+ "cover": {"a": "...", "b": "...", "accent": "...", "c": "...", "strip": ["...","...","..."], "sticker": "calc|cal|none", "src": "اقتباس حرفي من التفريغ", "image": {"prompt": "وصف مفصّل 70-120 كلمة...", "scene_ar": "...", "at": 5}},
  "slides": [
   {"type": "photo", "tab": {"ar": "السبب", "en": "Cause"}, "hd": [[{"t":"سطر 1","c":"hl"}],[{"t":"سطر 2","c":"hl rd"}]],
    "src": "اقتباس حرفي من التفريغ", "p": "نص مع **تأكيد**", "badge": "90%", "chips": ["..."], "slider": {"start": "...", "end": "..."}, "sticker": "cal", "button": "...",
-   "image": {"prompt": "...", "at": 12}},
+   "image": {"prompt": "...", "scene_ar": "...", "at": 12}},
   {"type": "table", "tab": {...}, "src": "اقتباس حرفي", "hd": [[{"t":"...","c":"hl"}]], "rows": [{"k":"...","v":"...","small":"..."}], "image": {...}}
  ],
  "cta": {"tab": {"ar": "تواصل", "en": "Contact"}, "hd": [[{"t":"سطر","c":"hl"}],[{"t":"سطر","c":"hl rd"}]], "p": "دعوة للإجراء من محتوى الملف + اكتب **«كلمة»** في التعليقات — وهنرد عليك على الخاص", "button": "نص الزر", "sticker": "cal|none", "src": "اقتباس حرفي", "image": {"prompt": "...", "at": 50}},
@@ -155,7 +251,7 @@ def storyboard_request(job):
     n = job.get('slides_total')
     cnt = ('عدد الشرايح الإجمالي المطلوب: %d بالظبط = غلاف + %d كروت داخل "slides" + صفحة CTA في "cta".' % (n, n - 2) + '\n') if n else 'عدد الشرايح: اختار الأنسب (من 5 إلى 7 إجمالًا).'+'\n'
     hint += cnt + '\n'
-    tr = '\n'.join('[%s] %s' % (mmss(l['t']), l['s']) for l in job['transcript_lines'])
+    tr = '\n'.join((l['s'] if job.get('text_only') else '[%s] %s' % (mmss(l['t']), l['s'])) for l in job['transcript_lines'])
     return STORYBOARD_SPEC + '\n' + hint + '---\nالتفريغ:\n' + tr + '\n'
 
 import llm
@@ -262,11 +358,91 @@ def reset_job(jid):
     job.clear(); job.update(keep); save(job)
 
 
-def analyze(jid):
+STAGE_NAMES = ['استلام', 'تجهيز الصوت', 'لقطات الفيديو', 'تفريغ الكلام', 'عدد الشرايح', 'كتابة نص الشرايح', 'التصميم المبدئي', 'الانسرتات', 'التصميم النهائي', 'التسليم']
+
+def goto_stage(jid, i):
+    """الرجوع لمرحلة في خريطة التنفيذ والبدء منها: 0-3 من الأول، 4 عدد الشرايح، 5 كتابة النص، 6 التصميم المبدئي، 7 الانسرتات، 8-9 التصميم النهائي.
+    يرمي ValueError برسالة واضحة لو المرحلة مش متاحة. كل مرحلة بتمسح ناتجها بس، وصور الانسرتات المحفوظة في فولدر المشروع بتفضل."""
+    job = load(jid); d = jdir(jid); i = int(i)
+    if not 0 <= i <= 9: raise ValueError('مرحلة غير صحيحة')
+    if job.get('status') in ('received', 'analyzing', 'rendering'): raise ValueError('الكاروسيل شغّال دلوقتي — استنى لما يخلص')
+    if i <= 3:
+        reset_job(jid); start(analyze, jid); return STAGE_NAMES[i]
+    if not (job.get('transcript') or '').strip(): raise ValueError('مفيش تفريغ لسه — ابدأ من «تفريغ الكلام»')
+    sbf = d / 'storyboard.json'
+    if i == 4:
+        if sbf.exists(): sbf.replace(d / 'storyboard.rejected.json')
+        for k in ('slides_total', 'slides_confirmed', 'slots', 'storyboard', 'grounding', 'validation_errors', 'results', 'draft', 'error'): job.pop(k, None)
+        job['choices'] = {}; job['slides_suggest'] = suggest_slides(job); job['status'] = 'awaiting_slides'
+        logj(job, '↩ رجعت لمرحلة اختيار عدد الشرايح'); save(job); return STAGE_NAMES[i]
+    if i == 5:
+        if not job.get('slides_total'): raise ValueError('اختار عدد الشرايح الأول')
+        if sbf.exists(): sbf.replace(d / 'storyboard.rejected.json')
+        for k in ('slots', 'storyboard', 'grounding', 'validation_errors', 'results', 'draft', 'error'): job.pop(k, None)
+        job['slides_confirmed'] = True; job['status'] = 'analyzing'; logj(job, '↩ إعادة كتابة نص الشرايح'); save(job); start(storyboard_stage, jid); return STAGE_NAMES[i]
+    if i == 6:
+        if not sbf.exists(): raise ValueError('مفيش نص شرايح لسه — ابدأ من «كتابة نص الشرايح»')
+        for k in ('results', 'error', 'validation_errors'): job.pop(k, None)
+        job['status'] = 'analyzing'; logj(job, '↩ إعادة التجهيز والتصميم المبدئي'); save(job); start(prepare, jid); return STAGE_NAMES[i]
+    if not job.get('slots') or not sbf.exists(): raise ValueError('جهّز التصميم المبدئي الأول')
+    if i == 7:
+        job['status'] = 'awaiting_images'; job.pop('error', None); logj(job, '↩ رجعت لمرحلة الانسرتات'); save(job); return STAGE_NAMES[i]
+    job['status'] = 'rendering'; job.pop('error', None); logj(job, '↩ إعادة التصميم النهائي'); save(job); start(finish, jid); return STAGE_NAMES[i]
+
+TEXT_EXT = ('.txt', '.md', '.srt', '.docx')
+
+def read_text_file(path):
+    """يقرا ملف نصي (txt / md / srt / docx) ويرجّع النص. يرمي ValueError لو فاضي أو غير مقروء."""
+    path = Path(path); ext = path.suffix.lower(); raw = path.read_bytes()
+    if ext == '.docx':
+        import zipfile, io, xml.etree.ElementTree as ET
+        try:
+            with zipfile.ZipFile(io.BytesIO(raw)) as z: root = ET.fromstring(z.read('word/document.xml'))
+        except Exception: raise ValueError('ملف Word مش مقروء — احفظه تاني كـ docx أو txt')
+        ns = '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}'
+        paras = [''.join(t.text or '' for t in p.iter(ns + 't')) for p in root.iter(ns + 'p')]
+        text = '\n'.join(x for x in paras if x.strip())
+    else:
+        text = None
+        for enc in ('utf-8-sig', 'utf-16', 'cp1256'):
+            try: text = raw.decode(enc); break
+            except Exception: continue
+        if text is None: raise ValueError('مش قادر أقرا ترميز الملف — احفظه UTF-8')
+        if ext == '.srt':
+            text = '\n'.join(l for l in text.splitlines() if l.strip() and not l.strip().isdigit() and '-->' not in l)
+    text = re.sub(r'[ \t]+', ' ', text).strip()
+    if len(text.split()) < 25: raise ValueError('النص قصير (أقل من 25 كلمة) — مش كفاية لعمل كاروسيل')
+    return text
+
+def analyze_text(jid):
+    """مدخل نصي (بدون صوت): نقرا الملف ونعتمده كتفريغ ونروح لاختيار عدد الشرايح."""
     job = load(jid); d = jdir(jid)
     try:
         job['status'] = 'analyzing'; save(job)
+        pdir = init_project(job); logj(job, '📁 فولدر المشروع: %s' % pdir)
+        plan(job, [('استلام الملف', 2), ('قراءة النص', 2)])
+        inp = next((p for p in d.glob('input.*')), None)
+        if not inp: raise RuntimeError('لا يوجد ملف إدخال')
+        job['input']['file'] = inp.name; stage(job, 1)
+        text = read_text_file(inp)
+        job.update({'transcript': text, 'transcript_lines': G.lines_from_text(text, 0), 'source_text': True, 'text_only': True, 'has_video': False, 'duration': 0,
+                    'transcript_quality': {'ok': True, 'reasons': [], 'words': len(text.split()), 'user': True}})
+        logj(job, 'النوع: ملف نصي · %d كلمة' % len(text.split())); end_plan(job)
+        if job.get('slides_total') or job.get('slides_confirmed'):
+            save(job); storyboard_stage(jid); return
+        job['slides_suggest'] = suggest_slides(job); job['status'] = 'awaiting_slides'
+        logj(job, '✋ توقف: اقتراح عدد الشرايح (%d) جاهز — اختار العدد وكمّل' % job['slides_suggest']['n'])
+        save(job)
+    except Exception as ex:
+        job = load(jid); end_plan(job); job['status'] = 'failed'; job['error'] = str(ex); logj(job, 'فشل: %s' % ex); traceback.print_exc()
+
+def analyze(jid):
+    job = load(jid); d = jdir(jid)
+    if os.path.splitext((job.get('input') or {}).get('name', '') or '')[1].lower() in TEXT_EXT: return analyze_text(jid)
+    try:
+        job['status'] = 'analyzing'; save(job)
         src = job.get('input', {})
+        pdir = init_project(job); logj(job, '📁 فولدر المشروع: %s' % pdir)
         # 1) الاستلام
         plan(job, [('استلام الملف', 90 if src.get('type') == 'url' else 4), ('تجهيز الصوت', 6), ('استخراج اللقطات', 25),
                    ('تفريغ الكلام (Scribe)', 30)])
@@ -410,7 +586,7 @@ def normalize(sb):
 
 def prepare(jid):
     """بعد وجود storyboard.json: يجهّز الخانات والبرومبتات واللقطات المرشّحة ويقف عند awaiting_images."""
-    job = load(jid); d = jdir(jid); job['status'] = 'analyzing'; plan(job, [('تجهيز الانسرتات واللقطات', 12), ('التصميم المبدئي', render_est(job))], 'prepare')
+    job = load(jid); d = jdir(jid); project_dir(job); migrate_legacy(job); job['status'] = 'analyzing'; plan(job, [('تجهيز الانسرتات واللقطات', 12), ('التصميم المبدئي', render_est(job))], 'prepare')
     sb = normalize(json.loads((d / 'storyboard.json').read_text(encoding='utf-8')))
     errs = G.validate_storyboard(sb, job.get('slides_total'))
     if errs:
@@ -437,7 +613,7 @@ def prepare(jid):
         cands += [{'file': 'frames/' + n, 'label': 'مشهد'} for n in scene[:10]] if job.get('has_video') else []
         mf = style_mf(job['style']); rd = renderer_for(job['style']); fw, fh = rd.FRAME.get(s['kind'], rd.FRAME['photo'])
         pr = imgstyle.compose(mf['image_style']['compose'].get(s['kind'], ''), s.get('prompt', ''), fw, fh)
-        slots.append({'id': s['id'], 'kind': s['kind'], 'label': s['label'], 'at': s.get('at'), 'prompt': s.get('prompt', ''), 'subject': s.get('prompt', ''),
+        slots.append({'id': s['id'], 'kind': s['kind'], 'label': s['label'], 'at': s.get('at'), 'prompt': s.get('prompt', ''), 'subject': s.get('prompt', ''), 'scene_ar': s.get('scene_ar', ''), 'words': len(str(s.get('prompt', '')).split()),
                       'full_prompt': pr['positive'], 'full_negative': pr['negative'], 'ratio': '%d×%d' % (fw, fh), 'candidates': cands})
     job['slots'] = slots; job['storyboard'] = {k: v for k, v in sb.items() if k != '_slots'}
     job['neg_prompt'] = imgstyle.STYLE['negative']; save(job)
@@ -466,7 +642,7 @@ def resolve_images(job):
         pool = sorted([os.path.join(folder, f) for f in os.listdir(folder) if f.lower().endswith(IMG_EXT)])
     for s in job['slots']:
         sid = s['id']
-        up = next((p for p in (d / 'images').glob(sid + '.*') if p.suffix.lower() in IMG_EXT), None)
+        up = find_insert(job, sid)
         if up: files[sid] = str(up); continue
         ch = job.get('choices', {}).get(sid)
         if ch and (d / ch).exists():
@@ -478,11 +654,11 @@ def resolve_images(job):
             else: files[sid] = str(d / ch)
             continue
         named = next((p for p in pool if re.match(r'^0*%s\D' % sid[1:], os.path.basename(p)) or os.path.splitext(os.path.basename(p))[0] in (sid,)), None)
-        if named: files[sid] = named
+        if named: files[sid] = str(save_insert(job, sid, named))
     # الصور المتبقية في الفولدر تُوزَّع بالترتيب على الخانات الفاضية
     rest = [p for p in pool if p not in files.values()]
     for s in job['slots']:
-        if s['id'] not in files and rest: files[s['id']] = rest.pop(0)
+        if s['id'] not in files and rest: files[s['id']] = str(save_insert(job, s['id'], rest.pop(0)))
     # خانات فاضية: لقطة الفيديو المقترحة (أو المختارة) بدقة الفيديو الأصلية
     inp = d / job.get('input', {}).get('file', '')
     for s in job['slots']:
@@ -499,7 +675,7 @@ def finish(jid):
     job = load(jid); d = jdir(jid)
     try:
         job['status'] = 'rendering'; plan(job, [('تجهيز الصور', 5), ('تصميم وترندر الشرايح', render_est(job)), ('تغليف النتيجة', 5)], 'finish')
-        sb = normalize(job['storyboard']); files = resolve_images(job)
+        project_dir(job); migrate_legacy(job); sb = normalize(job['storyboard']); files = resolve_images(job)
         missing = [s['id'] for s in job['slots'] if s['id'] not in files]
         if missing: logj(job, 'خانات بدون صور: %s (placeholder)' % ', '.join(missing))
         stage(job, 1); logj(job, 'تصميم الشرايح وترندرها بدقة 2160×2160…')
@@ -512,13 +688,64 @@ def finish(jid):
             for f in sorted((d / 'out').iterdir()):
                 if f.suffix != '.zip': z.write(f, f.name)
         job['results'] = ['out/' + Path(f).name for f in out_files]
-        dest = (job.get('out') or CFG.get('default_out_dir') or '').strip().strip('"')
-        if dest:
-            tgt = Path(dest) / (job['name'] or jid); tgt.mkdir(parents=True, exist_ok=True)
-            for f in (d / 'out').iterdir(): shutil.copy(f, tgt / f.name)
-            job['delivered'] = str(tgt); logj(job, 'تم النسخ إلى: %s' % tgt)
+        pd = project_dir(job); sd = pd / SUBDIRS['slides']; fd = pd / SUBDIRS['files']
+        for old in sd.glob('slide-*.png'): old.unlink()
+        for f in (d / 'out').iterdir():
+            if f.suffix.lower() == '.png' and f.name.startswith('slide-'): shutil.copy(f, sd / f.name)
+            else: shutil.copy(f, fd / f.name)
+        if (d / 'image_prompts.md').exists(): shutil.copy(d / 'image_prompts.md', fd / 'image_prompts.md')
+        job['delivered'] = str(pd); logj(job, '📁 اتحفظ في: %s  (الشرايح · الانسرتات · ملفات)' % pd)
         end_plan(job); job['rev'] = time.time(); job['status'] = 'done'; logj(job, '✓ تم التقفيل')
     except Exception as ex:
         job = load(jid); end_plan(job); job['status'] = 'failed'; job['error'] = str(ex); logj(job, 'فشل: %s' % ex); traceback.print_exc()
+
+def _slot_context(job, sb, sid):
+    """نص الشريحة + الجزء المناسب من التفريغ (حوالي دقيقة حوالين لحظة الشريحة)."""
+    k = int(sid[1:])
+    if k == 0: node, name = sb.get('cover') or {}, 'الغلاف'
+    elif k <= len(sb.get('slides') or []): node, name = sb['slides'][k - 1], 'شريحة %d' % (k + 1)
+    else: node, name = sb.get('cta') or {}, 'صفحة CTA'
+    hd = ' / '.join(' '.join(sg if isinstance(sg, str) else sg.get('t', '') for sg in (ln if isinstance(ln, list) else [ln])) for ln in node.get('hd', []))
+    txt = ' | '.join(x for x in (node.get('a'), node.get('b'), node.get('c'), hd, node.get('p'), node.get('src')) if x)
+    at = (node.get('image') or {}).get('at'); lines = job.get('transcript_lines') or []
+    if at is not None: seg = [l['s'] for l in lines if abs(l['t'] - float(at)) <= 40]
+    else: seg = []
+    if not seg: seg = [l['s'] for l in lines]
+    return name, node, txt, ' '.join(seg)[:2500]
+
+def regen_prompt(jid, sid, calls=None):
+    """يولّد برومبت بديل مفصّل لخانة واحدة من نفس محتوى الشريحة والتفريغ (من غير ما يخترع). يرمي خطأ واضح لو فشل."""
+    job = load(jid); sb = job.get('storyboard') or {}
+    slot = next((s for s in job.get('slots', []) if s['id'] == sid), None)
+    if not slot: raise ValueError('الخانة مش موجودة')
+    name, node, txt, seg = _slot_context(job, sb, sid)
+    prev = [slot.get('prompt', '')] + list(slot.get('prompt_history') or [])
+    q = ('أنت بتكتب برومبت صورة لشريحة في كاروسيل عن فيديو. الشريحة: %s.\nنص الشريحة: %s\n\nالجزء المناسب من كلام الفيديو:\n%s\n\n'
+         'اكتب برومبت **جديد ومختلف** (زاوية أو لحظة أو عنصر مختلف في نفس المرحلة) كوصف إنجليزي **مفصّل من 70 إلى 120 كلمة** لمشهد واحد محدد بيعبّر عن الجزء ده: '
+         'المرحلة أو العملية، المعدة/المادة بتفاصيلها المذكورة في الكلام، الحركة الجارية، موضع الكاميرا وزاويتها وقربها، والبيئة المحيطة. '
+         'ممنوع تضيف معدات أو أرقام أو معلومات مش في الكلام، وماتذكرش الأسلوب أو الإضاءة أو الألوان (بتتضاف تلقائيًا).\n'
+         'البرومبتات السابقة (لازم يكون الجديد مختلف عنها):\n%s\n\nأخرج JSON فقط: {"prompt": "...", "scene_ar": "سطر عربي: أنهي جزء من الفيديو والكلام اللي بتعبّر عنه الصورة"}'
+         % (name, txt, seg, '\n'.join('- ' + x for x in prev if x)))
+    gen = calls or call_claude
+    out = extract_json(gen(q) or '')
+    pr = str(out.get('prompt', '')).strip(); words = len(pr.split())
+    if words < 40 or words > 170 or sum(c.isascii() for c in pr) < len(pr) * 0.9:
+        raise ValueError('البرومبت المولَّد مش مطابق (لازم إنجليزي من 40 إلى 170 كلمة، طلع %d كلمة) — جرّب تاني' % words)
+    if pr.strip().lower() in [x.strip().lower() for x in prev]: raise ValueError('البرومبت المولَّد نفس القديم — جرّب تاني')
+    job = load(jid); sb = job['storyboard']; k = int(sid[1:])
+    node = sb['cover'] if k == 0 else (sb['slides'][k - 1] if k <= len(sb.get('slides') or []) else sb['cta'])
+    img = node.setdefault('image', {}); img['prompt'] = pr; img['scene_ar'] = str(out.get('scene_ar', '')).strip()
+    mf = style_mf(job['style']); rd = renderer_for(job['style'])
+    for s in job['slots']:
+        if s['id'] != sid: continue
+        fw, fh = rd.FRAME.get(s['kind'], rd.FRAME['photo']); c = imgstyle.compose(mf['image_style']['compose'].get(s['kind'], ''), pr, fw, fh)
+        s['prompt_history'] = (prev + list(s.get('prompt_history') or []))[:6]
+        s.update({'prompt': pr, 'subject': pr, 'scene_ar': img['scene_ar'], 'words': words, 'full_prompt': c['positive'], 'full_negative': c['negative']})
+        slot = s
+    job['storyboard'] = sb; save(job)
+    (jdir(jid) / 'storyboard.json').write_text(json.dumps(sb, ensure_ascii=False, indent=1), encoding='utf-8')
+    try: (jdir(jid) / 'image_prompts.md').write_text(imgstyle.markdown(job.get('name', ''), mf['label'], job['slots']), encoding='utf-8')
+    except Exception: pass
+    return slot
 
 def start(fn, jid): threading.Thread(target=fn, args=(jid,), daemon=True).start()

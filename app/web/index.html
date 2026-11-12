@@ -33,7 +33,7 @@ pre.log{background:#0E1634;color:#cfe;padding:12px;border-radius:12px;max-height
 .cands{display:flex;gap:8px;overflow-x:auto;padding:6px 0}.cands img{height:84px;border-radius:8px;border:3px solid transparent;cursor:pointer}.cands img.sel{border-color:var(--teal);box-shadow:0 0 0 2px var(--ink)}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}.grid img{width:100%;border-radius:12px;border:3px solid var(--ink)}
 .sl{background:#fff;border:2px solid #ddd;border-radius:12px;padding:10px;margin-top:10px}.sl b{display:block;margin-bottom:4px}
-.hide{display:none}details summary{cursor:pointer;font-weight:800;list-style:none;display:flex;align-items:center;gap:8px;padding:6px 0}details summary::-webkit-details-marker{display:none}details summary::before{content:'▾';display:inline-block;transition:transform .15s;transform:rotate(90deg);font-size:18px}details[open] summary::before{transform:rotate(0)}.fold>h2{cursor:pointer;display:flex;align-items:center;gap:8px}.fold>h2 .ar{transition:transform .15s;font-size:18px}.fold.closed>h2 .ar{transform:rotate(90deg)}.fold.closed>.fbody{display:none}.tools{display:flex;gap:8px;margin:8px 0;flex-wrap:wrap}.tools button{padding:6px 12px;font-size:13px}.up-th{display:block;margin-top:8px;max-width:160px;max-height:120px;border-radius:10px;border:1.5px solid rgba(31,81,148,.3)}
+.hide{display:none}details summary{cursor:pointer;font-weight:800;list-style:none;display:flex;align-items:center;gap:8px;padding:6px 0}details summary::-webkit-details-marker{display:none}details summary::before{content:'▾';display:inline-block;transition:transform .15s;transform:rotate(90deg);font-size:18px}details[open] summary::before{transform:rotate(0)}.fold>h2{cursor:pointer;display:flex;align-items:center;gap:8px}.fold>h2 .ar{transition:transform .15s;font-size:18px}.fold.closed>h2 .ar{transform:rotate(90deg)}.fold.closed>.fbody{display:none}.tools{display:flex;gap:8px;margin:8px 0;flex-wrap:wrap}.tools button{padding:6px 12px;font-size:13px}.pbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0}.pbar button{padding:6px 12px;font-size:13px}.pw{font-size:12px;color:#8a5b00;margin-inline-start:6px}.pw.ok{color:#2a7}.rg{margin-inline-start:6px;font-size:13px}.scn{background:#eef6ff;border-radius:10px;padding:8px 10px;margin:6px 0;font-size:14px}.up-th{display:block;margin-top:8px;max-width:160px;max-height:120px;border-radius:10px;border:1.5px solid rgba(31,81,148,.3)}
 .ok{color:#0a7d6f;font-weight:800;font-size:13px}
 .st{border:3px solid var(--ink);border-radius:16px;padding:8px 8px 8px;cursor:pointer;background:#fff;flex:0 0 140px;min-width:0;text-align:center;transition:.15s}.st b{display:block;font-size:15px;margin-bottom:6px}.st img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;display:block}.st.on{background:var(--teal);box-shadow:0 6px 0 rgba(8,12,40,.3);transform:translateY(-2px)}
 
@@ -41,6 +41,7 @@ pre.log{background:#0E1634;color:#cfe;padding:12px;border-radius:12px;max-height
 .rs{flex:1 1 0;min-width:84px;display:flex;flex-direction:column;align-items:center;position:relative;text-align:center}
 .rs::before{content:"";position:absolute;top:26px;right:50%;width:100%;height:4px;background:#d8dbe6;z-index:0}
 .rs:first-child::before{display:none}
+.rs.go{cursor:pointer}.rs.go:hover .ic{transform:scale(1.1);box-shadow:0 0 0 4px rgba(46,230,214,.35)}.rs.go:hover .lb{text-decoration:underline}
 .rs.done::before,.rs.cur::before,.rs.wait::before{background:var(--teal)}
 .rs .ic{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;background:#fff;border:3px solid #c3c8d8;position:relative;z-index:1;transition:.3s}
 .rs .ic svg{width:26px;height:26px;stroke:#9aa1b8;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
@@ -135,8 +136,8 @@ button.ghost,.btn.ghost{background:#fff;color:var(--blue);border:1.5px solid var
   <label>اسم الكاروسيل</label><input type="text" id="name" placeholder="مثال: حساب الخلطات - نوفمبر">
   <label>نمط التصميم</label><div id="styles" class="row" style="gap:10px"></div>
   <div class="row">
-    <div><label>ارفع صوت أو فيديو</label><input type="file" id="file" accept="audio/*,video/*"></div>
-    <div><label>أو رابط (يوتيوب / رابط مباشر) أو مسار ملف على جهازك</label><input type="text" id="url" placeholder="https://...   أو   D:\الفيديو\ملف.mp4" style="direction:ltr;text-align:left"></div>
+    <div><label>ارفع صوت أو فيديو أو ملف مكتوب (txt / docx / srt)</label><input type="file" id="file" accept="audio/*,video/*,.txt,.md,.srt,.docx"></div>
+    <div><label>أو رابط (يوتيوب / رابط مباشر). مسار ملف يتحط هنا بس لو الملف على جهاز السيرفر نفسه، ومن أي جهاز تاني استخدم «ارفع صوت أو فيديو»</label><input type="text" id="url" placeholder="https://...   أو   D:\الفيديو\ملف.mp4" style="direction:ltr;text-align:left"></div>
   </div>
   <p class="muted" style="margin-top:8px">هيتم التفريغ والتحليل وتجهيز اللقطات، وبعدها بيقف عند صفحة برومبتات الصور وينتظر صورك.</p>
   <div style="margin-top:12px"><button id="go" class="teal" onclick="go()">بسم الله</button> <span id="goMsg" class="muted" style="margin-inline-start:12px;font-weight:700"></span></div>
@@ -203,8 +204,11 @@ button.ghost,.btn.ghost{background:#fff;color:var(--blue);border:1.5px solid var
       <div id="slots"></div>
       <label>أو مسار فولدر صور على جهازك (الصور بترتيب الخانات، أو بأسماء تبدأ بـ 1 / 2 …)</label>
       <input type="text" id="folder" placeholder="C:\Users\surface\Downloads\...\INSERT">
-      <label>مكان حفظ النتيجة على جهازك (اختياري — وإلا تظل في فولدر الكاروسيل)</label>
-      <input type="text" id="outdir" placeholder="C:\Users\surface\Downloads\rooya\output">
+      <label>📁 فولدر المشروع (بيتعمل تلقائي جنب ملف المصدر، وفيه فولدرات: الانسرتات · الشرايح · ملفات)</label>
+      <div class="gsum ok" style="margin:6px 0"><span id="projPath" dir="ltr" style="font-weight:800;word-break:break-all"></span>
+        <div class="pbar"><button class="ghost" type="button" onclick="pickProj()">تغيير المكان…</button><button class="ghost" type="button" onclick="openProj()">فتح الفولدر</button><span id="projMsg" class="muted"></span></div>
+        <div class="muted">الصور اللي بترفعها بتتحفظ في «الانسرتات» بأسماء الشرايح (slide-03_...)، وبتتركّب تاني تلقائيًا في نفس الشريحة لو رجعت عدّلت.</div></div>
+      <input type="text" id="outdir" placeholder="أو اكتب مسار الفولدر الأب (لو بتفتح من جهاز تاني)">
       <div style="margin-top:16px"><button id="finish" class="teal">كمّل التصميم ←</button> <span id="finMsg" class="muted" style="margin-inline-start:12px;font-weight:700"></span>
       <div id="finWarn" class="gsum bad hide" style="margin-top:12px"></div></div></div></div>
   </div>
@@ -315,7 +319,17 @@ function drawRoad(j){
     let c='';if(r.all||i<r.cur)c='done';else if(i==r.cur)c=r.fail?'fail':(r.wait?'wait':'cur');
     if(i==2&&skipLens&&!r.all&&c!='')c='skip';else if(i==2&&skipLens)c='skip';
     const lab=(i==3&&c=='fail')?'مش متأكد من التفريغ':(i==5&&c=='fail')?'بند ناقص':(i==4&&c=='wait')?'دورك: اختار عدد الشرايح':(i==5&&c=='wait')?'مستني Claude يكتب النص':(i==7&&c=='wait')?'دورك: جهّز الصور':m[0];
-    return `<div class="rs ${c}"><div class="ic"><svg viewBox="0 0 24 24"><path d="${m[1]}"/></svg></div><div class="lb">${lab}</div></div>`;}).join('');
+    const busy=['received','analyzing','rendering'].includes(j.status),can=!busy&&(r.all||i<=r.cur)&&!(i==2&&skipLens);
+    return `<div class="rs ${c}${can?' go':''}"${can?` onclick="goStage(${i})" title="اضغط للرجوع لهذه المرحلة والبدء منها"`:''}><div class="ic"><svg viewBox="0 0 24 24"><path d="${m[1]}"/></svg></div><div class="lb">${lab}</div></div>`;}).join('');
+}
+const GO_MSG={0:'هتبدأ من أول المشروع: هيتمسح التفريغ والنص الحاليين ويتعاد التحليل كله.',1:'هتبدأ من تجهيز الصوت: هيتمسح التفريغ والنص الحاليين ويتعاد التحليل.',2:'هتبدأ من لقطات الفيديو: هيتمسح التفريغ والنص الحاليين ويتعاد التحليل.',3:'هتبدأ من تفريغ الكلام: هيتمسح التفريغ والنص الحاليين ويتعاد التفريغ.',
+  4:'هترجع لاختيار عدد الشرايح، وهيتمسح نص الشرايح الحالي. صور الانسرتات المحفوظة في فولدر المشروع بتفضل.',5:'هيتكتب نص الشرايح من جديد بنفس عدد الشرايح، وتعديلاتك على النص الحالي هتضيع.',
+  6:'هيتعاد التجهيز والتصميم المبدئي بالنص الحالي.',8:'هيتعاد التصميم النهائي بالنص والصور الحالية.',9:'هيتعاد التصميم النهائي والتسليم بالنص والصور الحالية.'};
+async function goStage(i){
+  if(GO_MSG[i]&&!await ask(GO_MSG[i]+' تكمّل؟'))return;
+  const r=await api(`/api/jobs/${jid}/goto`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({stage:i})});
+  if(r.error){alert(r.error);return;}
+  NT_SIG='';SL_SIG='';RES_SIG='';LOG_SIG='';ROAD_SIG='';rendered=false;forceReview=(i==7);startPoll();window.scrollTo(0,0);
 }
 
 let SL_SIG='',slidesPick=null;
@@ -361,19 +375,22 @@ function renderReview(j){
   $('#needConf').innerHTML=(sb.needs_confirmation||[]).length?'⚠️ محتاج تأكيد: '+sb.needs_confirmation.map(x=>'<br>• '+x).join(''):'';
   const G=j.grounding||{};
   $('#needConf').innerHTML=($('#needConf').innerHTML||'')+(G.summary?`<div class="gsum ${G.bad?'bad':'ok'}">${G.bad?'⚠':'✔'} التأصيل: ${esc(G.summary)}</div>`:'');
-  let h=`<div class="sl"><b>الغلاف</b>${groundBadge(G.cover)}`+['a','b','c'].map(k=>`<input type="text" data-k="cover.${k}" value="${esc(sb.cover[k]||'')}" style="margin:3px 0">`).join('')+`</div>`;
+  const hdIn=(pre,hd)=>(hd||[]).map((ln,li)=>(Array.isArray(ln)?ln:[ln]).map((sg,si)=>`<input type="text" data-k="${pre}.hd.${li}.${si}" value="${esc(typeof sg=='string'?sg:sg.t)}" style="margin:3px 0">`).join('')).join('');
+  const cv=sb.cover||{},LB=t=>`<div class="muted" style="margin-top:4px">${t}</div>`;
+  let h=`<div class="sl"><b>الغلاف (الصفحة الرئيسية)</b>${groundBadge(G.cover)}`+LB('العنوان الأكبر')+`<input type="text" data-k="cover.a" value="${esc(cv.a||'')}" style="margin:3px 0">`+LB('السطر التاني')+`<input type="text" data-k="cover.b" value="${esc(cv.b||'')}" style="margin:3px 0">`+LB('الكلمة الملونة (لازم تكون جزء من السطر التاني)')+`<input type="text" data-k="cover.accent" value="${esc(cv.accent||'')}" style="margin:3px 0">`+LB('السطر التالت')+`<input type="text" data-k="cover.c" value="${esc(cv.c||'')}" style="margin:3px 0">`+LB('الشريط السفلي')+[0,1,2].map(n=>`<input type="text" data-k="cover.strip.${n}" value="${esc((cv.strip||[])[n]||'')}" style="margin:3px 0">`).join('')+`</div>`;
   (sb.slides||[]).forEach((sl,i)=>{
     h+=`<div class="sl"><b>شريحة ${i+2} — ${esc((sl.tab||{}).ar||'')}</b>${groundBadge((G.slides||[])[i])}`;
     (sl.hd||[]).forEach((ln,li)=>{(Array.isArray(ln)?ln:[ln]).forEach((sg,si)=>{const t=typeof sg=='string'?sg:sg.t;h+=`<input type="text" data-k="s${i}.hd.${li}.${si}" value="${esc(t)}" style="margin:3px 0">`;});});
     if(sl.p!=null)h+=`<textarea data-k="s${i}.p">${esc(sl.p)}</textarea>`;
     h+=`</div>`;});
-  h+=`<div class="sl"><b>صفحة الـCTA</b>${groundBadge(G.cta)}</div>`;
+  const ct=sb.cta||{};
+  h+=`<div class="sl"><b>صفحة الـCTA</b>${groundBadge(G.cta)}`+LB('العنوان')+hdIn('cta',ct.hd)+LB('النص')+`<textarea data-k="cta.p">${esc(ct.p||'')}</textarea>`+LB('نص الزر')+`<input type="text" data-k="cta.button" value="${esc(ct.button||'')}" style="margin:3px 0"></div>`;
   $('#sbEdit').innerHTML=h;$('#caption').value=sb.caption||'';$('#neg').innerHTML='🔒 <b>نمط رؤية للصور — ثابت لكل الكاروسيلات</b>: تصوير صناعي وثائقي واقعي داخل مصنع ألبان، ألوان طبيعية، بدون نصوص أو وجوه. المتغير الوحيد هو موضوع كل صورة، ولكل صورة برومبت إيجابي وسلبي. <a href="/files/'+j.id+'/image_prompts.md" target="_blank">تنزيل كل البرومبتات (ملف)</a>';$('#neg').style.direction='rtl';$('#neg').style.textAlign='right';
-  $('#folder').value=j.folder||'';$('#outdir').value=j.out||'';
+  $('#folder').value=j.folder||'';$('#outdir').value=j.out||'';$('#projPath').textContent=j.project_dir||'';
   $('#slots').innerHTML=j.slots.map(s=>`<div class="slot${(j.uploaded||[]).includes(s.id)||(j.choices||{})[s.id]?' col':''}" id="sl_${s.id}"><h3 onclick="togSlot('${s.id}')"><button class="tg" type="button" title="فتح / طي">▾</button>${esc(s.label)}<span>${s.ratio}</span><span class="dn" id="d_${s.id}" style="background:#d9f2e3"></span></h3><div class="sbody">
-    <div class="muted" style="margin:4px 0">الموضوع (المتغير الوحيد): <b>${esc(s.subject||s.prompt||'')}</b></div><div class="prompt" id="p_${s.id}">${esc(s.full_prompt)}</div><div class="prompt neg" id="n_${s.id}">Negative prompt: ${esc(s.full_negative||'')}</div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="ghost" onclick="copy('p_${s.id}')">نسخ البرومبت</button><button class="ghost" onclick="copy('n_${s.id}')">نسخ السلبي</button><button class="ghost" onclick="copyBoth('${s.id}')">نسخ الاتنين</button></div>
+    ${s.scene_ar?`<div class="scn" id="sc_${s.id}">🎬 ${esc(s.scene_ar)}</div>`:`<div class="scn hide" id="sc_${s.id}"></div>`}<div class="muted" style="margin:4px 0">الموضوع (المتغير الوحيد): <b id="sj_${s.id}">${esc(s.subject||s.prompt||'')}</b> <span class="pw ${(s.words||0)>=60?'ok':''}" id="pw_${s.id}">${(s.words||0)<60?'⚠ برومبت قصير ('+(s.words||0)+' كلمة) — اضغط «إعادة توليد»':'✔ '+s.words+' كلمة'}</span></div><div class="prompt" id="p_${s.id}">${esc(s.full_prompt)}</div><div class="prompt neg" id="n_${s.id}">Negative prompt: ${esc(s.full_negative||'')}</div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="ghost" onclick="copy('p_${s.id}')">نسخ البرومبت</button><button class="ghost" onclick="copy('n_${s.id}')">نسخ السلبي</button><button class="ghost" onclick="copyBoth('${s.id}')">نسخ الاتنين</button><button class="ghost" id="rg_${s.id}" onclick="regen('${s.id}')">🔄 إعادة توليد برومبت آخر</button><span class="rg muted" id="rgm_${s.id}"></span></div>
     ${s.candidates.length?`<div class="muted" style="margin-top:8px">لقطات من الفيديو (اضغط لاختيار):</div><div class="cands">${s.candidates.map(c=>`<img src="/files/${j.id}/${c.file}" title="${c.label}" data-slot="${s.id}" data-file="${c.file}" onclick="pick(this)" class="${(j.choices||{})[s.id]==c.file?'sel':''}">`).join('')}</div>`:''}
-    <div style="margin-top:8px"><input type="file" accept="image/*" onchange="upload('${s.id}',this)"> <span class="ok" id="u_${s.id}"></span>${(j.uploaded_files||{})[s.id]?`<img class="up-th" id="t_${s.id}" src="/files/${j.id}/images/${encodeURIComponent(j.uploaded_files[s.id])}?t=${Date.now()}">`:`<img class="up-th hide" id="t_${s.id}">`}</div></div></div>`).join('');
+    <div style="margin-top:8px"><input type="file" accept="image/*" onchange="upload('${s.id}',this)"> <span class="ok" id="u_${s.id}"></span>${(j.uploaded_urls||{})[s.id]?`<img class="up-th" id="t_${s.id}" src="${j.uploaded_urls[s.id]}">`:`<img class="up-th hide" id="t_${s.id}">`}</div></div></div>`).join('');
   (j.uploaded||[]).forEach(id=>{const e=document.getElementById('u_'+id);if(e&&!e.textContent)e.textContent='✓ مرفوعة';});j.slots.forEach(s=>slotMark(s.id));
 }
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');}
@@ -387,13 +404,14 @@ async function upload(slot,inp){
   const f=inp.files[0];if(!f)return;const l=$('#u_'+slot);l.style.color='';l.textContent='جاري الرفع…';
   try{
     const r=await fetch(`/api/jobs/${jid}/upload?slot=${slot}&filename=${encodeURIComponent(f.name)}`,{method:'POST',body:f}).then(x=>x.json());
-    if(r.ok){l.textContent='✓ تم رفع '+f.name;if(PJ){PJ.uploaded=Array.from(new Set((PJ.uploaded||[]).concat([slot])));}slotMark(slot);const th=document.getElementById('t_'+slot);if(th){th.src=URL.createObjectURL(f);th.classList.remove('hide');}const e=document.getElementById('sl_'+slot);if(e)e.classList.add('col');}
+    if(r.ok){l.textContent='✓ اتحفظت في الانسرتات باسم: '+(r.saved_as||f.name);if(PJ){PJ.uploaded=Array.from(new Set((PJ.uploaded||[]).concat([slot])));}slotMark(slot);const th=document.getElementById('t_'+slot);if(th){th.src=URL.createObjectURL(f);th.classList.remove('hide');}const e=document.getElementById('sl_'+slot);if(e)e.classList.add('col');}
     else{l.style.color='#b00';l.textContent='✗ '+(r.error||'فشل الرفع');}
   }catch(e){l.style.color='#b00';l.textContent='✗ فشل الرفع: '+(e.message||e);}
 }
 function collect(){
   document.querySelectorAll('[data-k]').forEach(el=>{const k=el.dataset.k.split('.');
-    if(k[0]=='cover'){sb.cover[k[1]]=el.value;return;}
+    if(k[0]=='cover'){if(k[1]=='strip'){sb.cover.strip=sb.cover.strip||[];sb.cover.strip[+k[2]]=el.value;}else sb.cover[k[1]]=el.value;return;}
+    if(k[0]=='cta'){const c=sb.cta;if(k[1]=='hd'){const ln=c.hd[+k[2]];if(Array.isArray(ln)){if(typeof ln[+k[3]]=='string')ln[+k[3]]=el.value;else ln[+k[3]].t=el.value;}else c.hd[+k[2]]=el.value;}else c[k[1]]=el.value;return;}
     const i=+k[0].slice(1),sl=sb.slides[i];
     if(k[1]=='p'){sl.p=el.value;return;}
     if(k[1]=='hd'){const ln=sl.hd[+k[2]];if(Array.isArray(ln)){if(typeof ln[+k[3]]=='string')ln[+k[3]]=el.value;else ln[+k[3]].t=el.value;}else sl.hd[+k[2]]=el.value;}});
@@ -438,6 +456,35 @@ function renderResult(j){
   $('#delivered').textContent=j.delivered?'تم الحفظ في: '+j.delivered:'الملفات في: carousel-service\\jobs\\'+j.id+'\\out';
   $('#gallery').innerHTML=(j.results||[]).map(f=>`<a href="/files/${j.id}/${f}" target="_blank"><img src="/files/${j.id}/${f}?t=${Date.now()}"></a>`).join('');
   $('#zip').href=`/files/${j.id}/out/carousel.zip`;$('#pdf').href=`/files/${j.id}/out/carousel.pdf`;}
+
+async function regen(sid){
+  const b=$('#rg_'+sid),m=$('#rgm_'+sid);b.disabled=true;m.style.color='';m.textContent='جاري التوليد…';
+  try{
+    const r=await api(`/api/jobs/${jid}/reprompt`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({slot:sid})});
+    if(r.error)throw new Error(r.error);
+    const s=r.slot;$('#p_'+sid).textContent=s.full_prompt;$('#n_'+sid).textContent='Negative prompt: '+(s.full_negative||'');$('#sj_'+sid).textContent=s.subject||'';
+    const sc=$('#sc_'+sid);if(s.scene_ar){sc.textContent='🎬 '+s.scene_ar;sc.classList.remove('hide');}
+    const pw=$('#pw_'+sid);pw.textContent='✔ '+s.words+' كلمة (برومبت جديد)';pw.className='pw ok';
+    if(PJ){const x=(PJ.slots||[]).find(z=>z.id==sid);if(x)Object.assign(x,s);}
+    m.textContent='✓ اتولّد برومبت جديد';
+  }catch(e){m.style.color='#b00';m.textContent='✗ '+(e.message||e);}
+  finally{b.disabled=false;}
+}
+async function pickProj(){
+  const m=$('#projMsg');m.style.color='';m.textContent='افتح نافذة اختيار الفولدر على الجهاز…';
+  try{
+    const r=await api('/api/pickfolder',{method:'POST'});if(r.error)throw new Error(r.error);
+    if(!r.path){m.textContent='';return;}
+    const u=await api(`/api/jobs/${jid}/update`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({out:r.path})});
+    if(u.error)throw new Error(u.error);
+    $('#projPath').textContent=u.project_dir||'';$('#outdir').value=r.path;if(PJ){PJ.project_dir=u.project_dir;PJ.out=r.path;}m.textContent='✓ اتنقل المشروع للمكان الجديد';
+  }catch(e){m.style.color='#b00';m.textContent='✗ '+(e.message||e);}
+}
+async function openProj(){
+  const m=$('#projMsg');m.style.color='';
+  const r=await api(`/api/jobs/${jid}/open_project`,{method:'POST'});
+  if(r.error){m.style.color='#b00';m.textContent='✗ '+r.error;}else m.textContent='';
+}
 loadStyles();recent();
 </script>
 </body>
