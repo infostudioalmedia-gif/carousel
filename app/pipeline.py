@@ -7,8 +7,15 @@ import imgstyle
 import grounding as G
 
 APP = Path(__file__).parent
-CFG = json.loads((APP / 'config.json').read_text(encoding='utf-8'))
-JOBS = APP.parent / 'jobs'; JOBS.mkdir(exist_ok=True)
+def _load_cfg():
+    f = APP / 'config.json'
+    if not f.exists(): f = APP / 'config.example.json'        # نسخة الريبو/السحابة من غير مسارات جهاز
+    c = json.loads(f.read_text(encoding='utf-8'))
+    for env, k, cast in (('ROOYA_CHROME', 'chrome', str), ('ROOYA_PORT', 'port', int), ('ROOYA_HOST', 'host', str), ('ROOYA_JOBS', 'jobs_dir', str)):
+        if os.environ.get(env): c[k] = cast(os.environ[env])
+    return c
+CFG = _load_cfg()
+JOBS = Path(CFG['jobs_dir']) if CFG.get('jobs_dir') else APP.parent / 'jobs'; JOBS.mkdir(parents=True, exist_ok=True)
 LOCK = threading.Lock()
 IMG_EXT = ('.jpg', '.jpeg', '.png', '.webp')
 
@@ -210,7 +217,7 @@ def audio_level(path):
 
 def transcribe_checked(job, d):
     """يفرّغ الصوت ويتحقق (نص + ثقة Scribe). لو مشكوك فيه: 3 محاولات (الثالثة بصوت عالي الجودة)، وإلا يرجّع جودة فاشلة."""
-    key = read_key(CFG['eleven_env']); dur = job.get('duration', 0)
+    key = os.environ.get('ELEVENLABS_API_KEY', '').strip() or read_key(CFG['eleven_env']); dur = job.get('duration', 0)
     job['audio_db'] = audio_level(d / 'audio.mp3'); save(job)
     sc = None; q = {'ok': False, 'reasons': ['لم تتم أي محاولة'], 'words': 0}
     for n in range(3):

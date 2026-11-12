@@ -7,8 +7,18 @@ import pipeline as P
 
 WEB = Path(__file__).parent / 'web'
 
+import base64, hmac
+PASSWORD = os.environ.get('ROOYA_PASSWORD', '')
+
 class H(BaseHTTPRequestHandler):
     def log_message(self, *a): pass
+    def authed(self):
+        if not PASSWORD: return True
+        h = self.headers.get('Authorization', '')
+        try: pw = base64.b64decode(h.split(' ', 1)[1]).decode('utf-8').split(':', 1)[1] if h.startswith('Basic ') else ''
+        except Exception: pw = ''
+        if hmac.compare_digest(pw.encode(), PASSWORD.encode()): return True
+        self.send_response(401); self.send_header('WWW-Authenticate', 'Basic realm="Rooya Carousel"'); self.send_header('Content-Length', '0'); self.end_headers(); return False
     def send_json(self, obj, code=200):
         b = json.dumps(obj, ensure_ascii=False).encode('utf-8')
         self.send_response(code); self.send_header('Content-Type', 'application/json; charset=utf-8')
@@ -29,6 +39,7 @@ class H(BaseHTTPRequestHandler):
         self.send_header('Content-Length', str(len(data))); self.send_header('Cache-Control', 'no-cache'); self.end_headers(); self.wfile.write(data)
 
     def do_GET(self):
+        if not self.authed(): return
         u = urllib.parse.urlparse(self.path); path = urllib.parse.unquote(u.path)
         if path in ('/', '/index.html'): return self.serve_file(WEB / 'index.html')
         if path == '/api/styles': return self.send_json(P.list_styles())
@@ -64,6 +75,7 @@ class H(BaseHTTPRequestHandler):
         self.send_json({'error': 'not found'}, 404)
 
     def do_POST(self):
+        if not self.authed(): return
         u = urllib.parse.urlparse(self.path); path = u.path; q = urllib.parse.parse_qs(u.query)
         try:
             if path == '/api/jobs/new':           # رفع ملف خام: الجسم = bytes
@@ -136,4 +148,4 @@ if __name__ == '__main__':
             raise SystemExit(1)
     P.recover(); port = P.CFG.get('port', 8765)
     print('سيستم كاروسيل رؤية — http://localhost:%d' % port, flush=True)
-    ThreadingHTTPServer(('127.0.0.1', port), H).serve_forever()
+    ThreadingHTTPServer((P.CFG.get('host', '127.0.0.1'), port), H).serve_forever()

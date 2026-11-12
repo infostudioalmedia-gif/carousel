@@ -23,7 +23,7 @@ def check_tools():
     miss = [t for t in ('ffmpeg', 'ffprobe') if not shutil.which(t)]
     if miss:
         raise RuntimeError('أدوات ناقصة على PATH: ' + ', '.join(miss))
-    if not os.path.exists(P.CFG['chrome']):
+    if not (os.path.exists(P.CFG['chrome']) or shutil.which(P.CFG['chrome'])):
         raise RuntimeError('Chrome مش موجود في المسار: %s' % P.CFG['chrome'])
     return 'ffmpeg · ffprobe · Chrome'
 
