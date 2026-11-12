@@ -1,0 +1,122 @@
+/* رؤية — كاروسيل V3 — 1080×1080 (1:1) — النسبة الذهبية φ=1.618
+   سُلّم الخط (φ): 22 · 28 · 36(√φ) · 45 · 73   |   سُلّم المسافات (فيبوناتشي): 8 · 13 · 21 · 34 · 55 · 89
+   توزيع الكارت: الصورة 61.8% / النص 38.2% (والعكس في شريحة التفاصيل) */
+@font-face{font-family:'Graphik';src:url('../fonts/GraphikArabic-Regular.ttf');font-weight:400;}
+@font-face{font-family:'Graphik';src:url('../fonts/GraphikArabic-Medium.ttf');font-weight:500;}
+@font-face{font-family:'Graphik';src:url('../fonts/GraphikArabic-Semibold.ttf');font-weight:600;}
+@font-face{font-family:'Graphik';src:url('../fonts/GraphikArabic-Bold.ttf');font-weight:700;}
+@font-face{font-family:'Graphik';src:url('../fonts/GraphikArabic-Black.ttf');font-weight:900;}
+:root{--ink:#0E1634;--teal:#4FE6D5;--gold:#FFD27A;--alert:#FF8A8A;--card:#F3F1EB;
+  --m:55px;--s1:8px;--s2:13px;--s3:21px;--s4:34px;--s5:55px;--s6:89px;
+  --f1:22px;--f2:28px;--f3:36px;--f4:45px;--f5:73px;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#000;font-family:'Graphik',sans-serif;-webkit-font-smoothing:antialiased;}
+.slide{position:relative;width:1080px;height:1080px;overflow:hidden;direction:rtl;color:#fff;
+  background:
+    radial-gradient(circle at 3px 3px,rgba(79,230,213,.28) 4.4px,transparent 5.2px) 0 0/233px 233px,
+    radial-gradient(circle at 3px 3px,rgba(255,255,255,.14) 2.6px,transparent 3.3px) 0 0/55px 55px,
+    radial-gradient(90% 55% at 100% 0%,rgba(150,200,250,.34),transparent 62%),
+    radial-gradient(80% 50% at 0% 100%,rgba(100,160,230,.26),transparent 60%),
+    linear-gradient(162deg,#3A63AE 0%,#2E4E98 38%,#253F86 70%,#1B2F70 100%);}
+
+/* شريط علوي */
+.top{position:absolute;top:var(--s4);left:var(--m);right:var(--m);display:flex;align-items:center;justify-content:space-between;z-index:3;}
+.top img{height:46px;display:block;}
+.pill{display:inline-block;padding:var(--s1) var(--s3);border:2.5px solid rgba(255,255,255,.6);border-radius:999px;font-weight:600;font-size:var(--f1);line-height:1.3;color:#fff;}
+.pill.tl{border-color:var(--teal);color:var(--teal);}
+/* فوتر + رقم الشريحة */
+.foot{position:absolute;left:var(--m);right:var(--m);bottom:var(--s4);z-index:3;}
+.foot::before{content:"";display:block;height:2px;background:rgba(255,255,255,.32);margin-bottom:var(--s2);}
+.foot .r{display:flex;align-items:center;justify-content:space-between;}
+.foot .ic{display:flex;gap:var(--s3);}
+.foot .ic svg{width:30px;height:30px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;opacity:.8;}
+.foot .pill{padding:5px var(--s2);}
+.num{direction:ltr;unicode-bidi:isolate;display:inline-block;font-weight:900;color:var(--teal);}
+
+/* طباعة */
+h1,.hd{font-family:'Graphik';font-weight:900;}
+h1{font-size:var(--f5);line-height:1.36;}
+.hl{background:var(--teal);color:var(--ink);padding:0 var(--s2);margin:0 -5px;box-decoration-break:clone;-webkit-box-decoration-break:clone;}
+.hl.rd{background:var(--alert);}
+.strip{display:flex;align-items:center;justify-content:center;gap:var(--s3);padding:var(--s1) var(--s3);background:var(--teal);color:var(--ink);font-weight:700;font-size:var(--f3);line-height:1.4;}
+.strip i{width:11px;height:11px;border-radius:50%;background:var(--ink);opacity:.55;flex:none;}
+.stk{position:absolute;filter:drop-shadow(0 8px 0 rgba(8,12,40,.28));z-index:5;}
+.stk svg{display:block;overflow:visible;}
+.spark{position:absolute;width:38px;height:38px;z-index:5;}
+.orb{position:relative;display:inline-block;}
+.orb::after{content:"";position:absolute;inset:4px -22px -4px -22px;border:3px solid #fff;border-radius:50%;transform:rotate(-4deg);pointer-events:none;}
+.chev{display:flex;align-items:center;justify-content:center;background:var(--teal);color:var(--ink);height:46px;padding:0 var(--s3);font-weight:900;font-size:var(--f1);direction:ltr;letter-spacing:8px;}
+
+/* صور بألوانها الطبيعية */
+.ph{position:relative;width:100%;border-radius:21px;overflow:hidden;border:3px solid var(--ink);background:#243F86;flex:none;}
+.ph img{display:block;width:100%;height:100%;object-fit:cover;}
+.ph.big{border:4px solid var(--teal);box-shadow:0 13px 0 rgba(8,12,40,.28);border-radius:28px;}
+
+/* كارت بتابات — ارتفاع ثابت 800 */
+.fold{position:absolute;left:var(--m);right:var(--m);top:var(--s6);z-index:2;}
+.tabs{display:flex;direction:rtl;gap:6px;padding:0 8px;height:68px;align-items:flex-end;}
+.tab{flex:1;height:52px;border-radius:20px 20px 0 0;background:rgba(79,230,213,.30);border:2px solid rgba(255,255,255,.22);border-bottom:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:700;font-size:var(--f1);line-height:1.15;color:rgba(255,255,255,.8);}
+.tab.on{height:68px;background:var(--card);border-color:var(--card);color:var(--ink);font-size:var(--f2);position:relative;z-index:2;margin-bottom:-2px;font-weight:900;}
+.tab small{font-family:'Graphik';font-weight:600;font-size:17px;direction:ltr;}
+.fcard{background:var(--card);color:var(--ink);border-radius:0 0 28px 28px;padding:var(--s3);height:800px;box-shadow:0 18px 0 rgba(8,12,40,.28);position:relative;z-index:1;display:flex;flex-direction:column;}
+.fcard::before{content:"";position:absolute;left:0;right:0;top:-2px;height:2px;background:var(--card);}
+.txt{flex:1;display:flex;flex-direction:column;justify-content:center;min-height:0;}
+.cap .hd{font-size:var(--f4);line-height:1.42;color:var(--ink);}
+.cap p{margin-top:var(--s1);font-weight:500;font-size:var(--f2);line-height:1.55;color:rgba(14,22,52,.92);}
+.cap p b{font-weight:900;}
+.chips{position:absolute;left:0;right:0;bottom:var(--s3);display:flex;gap:var(--s2);justify-content:center;z-index:4;}
+.chip{display:flex;align-items:center;gap:var(--s1);padding:5px var(--s3) 5px var(--s2);border-radius:999px;border:2.5px solid rgba(14,22,52,.25);background:#fff;font-weight:700;font-size:var(--f2);color:var(--ink);}
+.chip svg{width:30px;height:30px;flex:none;}
+.badge{position:absolute;z-index:6;background:var(--gold);color:var(--ink);border:5px solid var(--ink);border-radius:21px;padding:4px var(--s3);font-weight:900;font-size:var(--f5);line-height:1.1;direction:ltr;box-shadow:0 8px 0 rgba(8,12,40,.32);}
+.rows{margin-top:var(--s2);}
+.rw{display:flex;align-items:center;direction:rtl;}
+.rw .l,.rw .r{flex:none;padding:var(--s1) var(--s3);border-radius:999px;border:2.5px solid rgba(14,22,52,.25);background:#fff;font-weight:700;font-size:var(--f2);min-width:250px;text-align:center;}
+.rw .ln{flex:1;height:4px;background:rgba(14,22,52,.2);position:relative;}
+.rw .dot{position:absolute;top:-11px;width:26px;height:26px;border-radius:50%;background:var(--teal);border:3px solid var(--ink);}
+.tbl{border:2.5px solid var(--ink);border-radius:16px;overflow:hidden;background:#fff;flex:1;display:flex;flex-direction:column;margin-top:var(--s3);}
+.tr{display:flex;direction:rtl;border-top:2px solid rgba(14,22,52,.2);flex:1;}
+.tr:first-child{border-top:0;}
+.tr .k{flex:none;width:170px;padding:0 var(--s3);background:var(--teal);font-weight:900;font-size:var(--f2);border-left:2.5px solid var(--ink);display:flex;align-items:center;}
+.tr .v{flex:1;padding:0 var(--s4);font-weight:700;font-size:var(--f3);line-height:1.3;display:flex;flex-direction:column;justify-content:center;}
+.tr .v small{display:block;font-weight:500;font-size:var(--f1);color:rgba(14,22,52,.6);}
+.cta-btn{display:flex;justify-content:flex-start;margin-top:var(--s2);}
+.cta-btn span{background:var(--ink);color:#fff;font-weight:900;font-size:var(--f3);padding:var(--s2) var(--s4);border-radius:14px;box-shadow:0 6px 0 rgba(8,12,40,.3);}
+
+/* عناوين الغلاف — سُلّم φ: 118 · 73 · 45 (القراءة من الأكبر للأصغر) */
+.ha{font-family:'Graphik';font-weight:900;font-size:118px;line-height:1.3;}
+.hb{margin-top:var(--s3);font-family:'Graphik';font-weight:900;font-size:var(--f5);line-height:1.3;}
+.hb .n{color:var(--teal);direction:ltr;unicode-bidi:isolate;display:inline-block;}
+.hc{margin-top:var(--s2);font-family:'Graphik';font-weight:900;font-size:var(--f4);line-height:1.4;color:rgba(255,255,255,.92);}
+.ha .hl{padding:0 var(--s3);}
+/* اسحب + سهم انسيابي */
+.swipe{display:flex;align-items:center;gap:var(--s2);font-weight:700;font-size:var(--f2);color:#fff;direction:rtl;}
+.swipe svg{width:150px;height:44px;display:block;}
+
+/* ===== غلاف: صورة ملء الشريحة بدون فريم ===== */
+.cv-ph{position:absolute;inset:0;z-index:0;}
+.cv-ph img{display:block;width:100%;height:100%;object-fit:cover;}
+.cv-top{position:absolute;left:0;right:0;top:0;height:230px;z-index:1;background:linear-gradient(to bottom,rgba(20,32,80,.62),rgba(20,32,80,0));}
+/* التلاشي لنفس كحلي الخلفية: النص والمستطيل دايمًا على لون موحّد */
+.cv-fade{position:absolute;inset:0;z-index:1;background:linear-gradient(to bottom,
+  rgba(30,52,118,0) 0%,rgba(30,52,118,0) 26%,rgba(30,52,118,.42) 40%,rgba(28,48,112,.80) 52%,rgba(27,47,112,.95) 62%,#1B2F70 72%,#1B2F70 100%);}
+.cv-dots{position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:radial-gradient(circle at 3px 3px,rgba(79,230,213,.28) 4.4px,transparent 5.2px) 0 0/233px 233px,
+             radial-gradient(circle at 3px 3px,rgba(255,255,255,.13) 2.4px,transparent 3px) 0 0/55px 55px;
+  -webkit-mask-image:linear-gradient(to bottom,transparent 38%,#000 66%);mask-image:linear-gradient(to bottom,transparent 38%,#000 66%);}
+.cv-text{position:absolute;right:55px;left:55px;top:432px;z-index:3;}
+.cv-text .ha,.cv-text .hb,.cv-text .hc{text-shadow:0 3px 18px rgba(14,22,60,.55);}
+.cv-strip{position:absolute;right:55px;left:55px;top:838px;z-index:3;}
+.cover-note{display:none}
+/* ===== CTA + باركود ===== */
+.ctarow{flex-direction:row !important;align-items:center;gap:var(--s3);}
+.qrb{flex:none;width:200px;display:flex;flex-direction:column;align-items:center;gap:var(--s1);}
+.qrb img{width:188px;height:188px;background:#fff;border-radius:16px;padding:10px;border:3px solid var(--ink);display:block;}
+.qrb span{font-weight:700;font-size:var(--f1);color:rgba(14,22,52,.75);}
+.ctarow .cta-btn{justify-content:flex-start;}
+
+/* تابات كتير (7+ شرايح): خط أصغر */
+.tabs.t7 .tab{font-size:20px}.tabs.t7 .tab.on{font-size:25px}.tabs.t7 .tab small{font-size:16px}
+.tabs.t8 .tab{font-size:18px}.tabs.t8 .tab.on{font-size:23px}.tabs.t8 .tab small{font-size:14px}
+.tabs.t9 .tab{font-size:16px}.tabs.t9 .tab.on{font-size:21px}.tabs.t9 .tab small{font-size:12px}
+.tabs.t8 .tab,.tabs.t9 .tab{padding:0 2px;letter-spacing:-.2px}

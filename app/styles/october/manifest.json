@@ -1,0 +1,19 @@
+{
+ "id": "october",
+ "label": "أكتوبر",
+ "month": "2026-10",
+ "desc": "صورة بملء الشريحة تتلاشى لجريدانت سفلي · بطاقات زجاجية · Handicrafts",
+ "renderer": "renderer_october",
+ "image_style": {
+  "compose": {
+   "cover": "Landscape-to-square frame; subject in the upper 60%; the LOWER 40% of the frame is dark, calm and empty (title sits there).",
+   "photo": "Square frame 1:1; main subject only in the UPPER 45% of the frame; the LOWER 55% is dark, soft and uncluttered (text overlay area).",
+   "table": "Square frame 1:1; main subject only in the UPPER 45%; the LOWER 55% dark, soft, uncluttered.",
+   "cta": "Square frame 1:1; main subject only in the UPPER 45% of the frame; the LOWER 55% is dark, soft and uncluttered (text overlay area)."
+  }
+ },
+ "fields": "الغلاف a (ذهبي) + b/c (تيل) · الشرايح: hd (سطر 2 تيل) + points (2–4 نقاط قصيرة) + p (خلاصة) · الأخيرة: button كدعوة · cta ثابتة: hd + p + button (+ باركود تلقائي)",
+ "render_est": 60,
+ "thumb": "thumb.jpg",
+ "title": "Oct Design"
+}

@@ -1,0 +1,19 @@
+{
+ "id": "november",
+ "label": "نوفمبر",
+ "month": "2026-11",
+ "desc": "كروت فولدر بتابات · صور داخل إطار · خلفية كحلي بجريد منقط · φ",
+ "renderer": "renderer_november",
+ "image_style": {
+  "compose": {
+   "cover": "Square 1:1 frame, FULL-BLEED cover photo: the main subject (hands / product) only in the UPPER 45% of the frame; the LOWER 55% is dark, soft and uncluttered (the title sits there).",
+   "photo": "Wide landscape frame; subject fills the frame; no need for empty areas — the photo sits inside a framed card.",
+   "table": "Very wide, short landscape strip; subject centred, wide establishing view.",
+   "cta": "Wide landscape frame; subject fills the frame; calm, inviting hands-on scene; the photo sits inside a framed card."
+  }
+ },
+ "fields": "غلاف a/b/c + strip · كروت: hd + p (≤110 حرف) + اختياري badge/chips/slider/sticker · table: rows · cta ثابتة: hd + p + button (+ باركود تلقائي)",
+ "render_est": 35,
+ "thumb": "thumb.jpg",
+ "title": "Nov Design"
+}

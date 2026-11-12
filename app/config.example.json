@@ -1,0 +1,13 @@
+{
+  "port": 8765,
+  "eleven_env": "C:\Users\YOUR_USER\\Downloads\\rooya\\ELEVEN LAPS API KEY .env",
+  "language": "ara",
+  "chrome": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+  "anthropic_env_var": "ANTHROPIC_API_KEY",
+  "anthropic_model": "claude-sonnet-5-5",
+  "default_out_dir": "",
+  "anthropic_env_file": "C:\Users\YOUR_USER\\Downloads\\rooya\\ANTHROPIC API KEY .env",
+  "text_provider": "auto",
+  "gemini_env_file": "C:\Users\YOUR_USER\\Downloads\\rooya\\GEMINI API KEY .env",
+  "gemini_model": "auto"
+}

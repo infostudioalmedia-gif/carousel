@@ -1,0 +1,7 @@
+{
+ "name": "Rooya Photographic Style",
+ "version": 1,
+ "note": "المصدر الوحيد لنمط برومبتات الصور — ثابت لكل الكاروسيلات وكل أنماط التصميم. المتغير الوحيد هو الموضوع (Subject) لكل صورة. لا يتغيّر هنا إلا بقرار من رؤية.",
+ "positive_base": "Photorealistic industrial documentary photography inside a real, modern dairy processing plant: polished 316L stainless steel, visible sanitary welds, hygienic white-tiled walls. Lighting: hard raking sidelight from camera-left with soft neutral fill. Colour: natural, true-to-life, neutral white balance - NO blue or teal colour cast, no colour grading. Shot on 50mm lens, f/4, shallow depth of field, high detail, clean uncluttered composition. NO text, NO letters, NO numbers, NO logos, NO watermarks anywhere in the image. NO recognizable human faces (hands, backs, silhouettes only).",
+ "negative": "text, letters, arabic text, english text, numbers, typography, logo, watermark, signature, cartoon, illustration, flat vector, 3d render look, plastic, cgi, oversaturated, blue tint, teal tint, colour cast, cluttered background, human face, distorted metal, extra pipes, lens flare, blurry, low resolution, jpeg artifacts, deformed hands, extra fingers, duplicated objects, warped geometry"
+}

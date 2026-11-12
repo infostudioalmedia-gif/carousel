@@ -1,0 +1,219 @@
+/* كاروسيل «الكاراجينان في صناعة الألبان» — 11 أكتوبر 2026 · مربع 1080 · سيستم v2 */
+@import url('../_system/v2-tokens.css');
+@import url('../_system/v2-base.css');
+
+:root{
+  --f7: 84px; --logo-top:52px; --wrap-top:150px; --wrap-bot:116px;
+  --rule-bot:84px; --foot-bot:40px;
+  --cover-top:445px; --cta-slot:660px; --cta-body:372px; --qr:112px;
+}
+.slide{height:1080px;}
+.hero .wrap{top:var(--hero-text);}
+.plain .wrap .h2{margin-bottom:0;}
+.deg{direction:ltr;unicode-bidi:isolate;display:inline-block;}
+.lat{font-family:'Graphik';direction:ltr;unicode-bidi:isolate;display:inline-block;}
+
+/* ---------- غلاف / CTA : الرسمة ---------- */
+.cover .art,.cta .art{position:absolute;inset:0 0 auto 0;z-index:0;
+  -webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 52%,transparent 100%);
+          mask-image:linear-gradient(to bottom,#000 0%,#000 52%,transparent 100%);}
+.cover .art{height:700px;}
+.cta .art{height:var(--cta-slot);}
+.cover .art img,.cta .art img{display:block;width:100%;height:100%;object-fit:cover;}
+.cover .scrim-bot{height:420px;background:linear-gradient(to bottom,rgba(8,16,46,0) 0%,rgba(8,16,46,.62) 38%,rgba(8,16,46,.86) 78%,rgba(8,16,46,0) 100%);}
+.cover .h1{font-size:92px;text-shadow:0 3px 14px rgba(4,10,40,.85),0 12px 42px rgba(4,10,40,.7);}
+.cover .gd{color:var(--gold);}
+.quote{margin-top:var(--s4);}
+.cta .ask{margin-top:var(--s3);font-weight:700;font-size:var(--f2);line-height:1.45;color:var(--teal);}
+.cta .lede{margin-top:var(--s3);}
+
+/* ---------- بطاقة معلومة ---------- */
+.stps{display:flex;flex-direction:column;gap:var(--s3);}
+.stp{display:flex;align-items:center;gap:var(--s4);padding:var(--s4);border-radius:var(--r-m);
+  background:var(--glass-1);border:var(--stroke);box-shadow:var(--sh-1);}
+.stp .n{flex:none;width:var(--s7);height:var(--s7);border-radius:var(--r-m);display:grid;place-items:center;direction:ltr;
+  font-family:'Handicrafts';font-weight:700;font-size:var(--f4);color:#0F2150;
+  background:linear-gradient(150deg,#7FF0E2,#3FD4C2);box-shadow:var(--sh-2), inset 0 2px 0 rgba(255,255,255,.4);}
+.stp .n svg{width:48px;height:48px;display:block;}
+.stp .tx{flex:1;min-width:0;}
+.stp .tx b{display:block;font-family:'Handicrafts';font-weight:700;font-size:var(--f3);line-height:1.2;color:#fff;}
+.stp .tx p{margin-top:var(--s1);font-weight:500;font-size:var(--f2);line-height:1.5;color:rgba(255,255,255,.88);}
+.stp .tx p b{display:inline;font-family:'Graphik';font-size:inherit;font-weight:700;color:var(--teal);}
+
+/* شريط خلاصة */
+.bar{padding:var(--s3) var(--s4);border-radius:var(--r-m);font-weight:500;font-size:var(--f2);line-height:1.55;color:#fff;
+  background:rgba(79,230,213,.14);border:1.5px solid rgba(79,230,213,.40);margin-top:var(--s4);}
+.bar b{font-weight:700;color:var(--teal);}
+
+/* نقاط */
+.pts{display:flex;flex-direction:column;gap:var(--s2);}
+.pt{display:flex;align-items:center;gap:var(--s3);padding:var(--s2) var(--s3);border-radius:var(--r-s);background:var(--glass-2);border:var(--stroke);}
+.pt i{flex:none;width:var(--s6);height:var(--s6);border-radius:var(--r-s);display:grid;place-items:center;font-style:normal;
+  font-family:'Handicrafts';font-weight:700;font-size:var(--f3);color:#2A1B00;background:linear-gradient(150deg,#FFE9A8,#E7BC72);}
+.pt p{flex:1;font-weight:500;font-size:var(--f3);line-height:1.35;color:#fff;}
+.pt p b{font-weight:700;color:var(--teal);}
+
+/* ---------- شريحة الكازين: الدياجرام ---------- */
+.dgm{margin-top:var(--s3);border-radius:var(--r-m);border:var(--stroke);box-shadow:var(--sh-2);
+  background:linear-gradient(150deg,rgba(255,255,255,.08),rgba(255,255,255,.025));overflow:hidden;}
+.dgm svg{display:block;width:100%;height:auto;}
+.dgm svg text{font-family:'Graphik';font-weight:600;}
+
+/* ---------- الأنواع الثلاثة ---------- */
+.types{display:flex;flex-direction:column;gap:var(--s3);}
+.ty{display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s4);border-radius:var(--r-m);
+  background:var(--glass-1);border:var(--stroke);box-shadow:var(--sh-1);}
+.ty .gr{flex:none;width:var(--s7);height:var(--s7);border-radius:var(--r-m);display:grid;place-items:center;
+  font-family:'Graphik';font-weight:700;font-size:var(--f5);line-height:1;color:#2A1B00;
+  background:linear-gradient(150deg,#FFE9A8,#E7BC72);box-shadow:var(--sh-2), inset 0 2px 0 rgba(255,255,255,.5);}
+.ty .tx{flex:1;min-width:0;}
+.ty .tx b{display:block;font-family:'Handicrafts';font-weight:700;font-size:var(--f4);line-height:1.15;color:#fff;}
+.ty .tx b span{font-family:'Graphik';font-weight:600;font-size:var(--f1);color:rgba(255,255,255,.55);direction:ltr;unicode-bidi:isolate;display:inline-block;margin-right:var(--s2);}
+.ty .tx p{margin-top:var(--s1);font-weight:500;font-size:var(--f2);line-height:1.4;color:rgba(255,255,255,.88);}
+.ty .tx p b{display:inline;font-family:'Graphik';font-size:inherit;color:var(--teal);}
+.mt{flex:none;display:flex;flex-direction:column;align-items:center;gap:6px;}
+.mt .bars{display:flex;gap:5px;direction:ltr;}
+.mt .bars i{display:block;width:16px;height:34px;border-radius:5px;background:rgba(255,255,255,.18);}
+.mt .bars i.on{background:var(--teal);box-shadow:0 0 12px rgba(79,230,213,.5);}
+.mt u{text-decoration:none;font-weight:600;font-size:18px;color:rgba(255,255,255,.55);}
+
+/* ---------- بطاقتين جنب بعض (كابا / يوتا) ---------- */
+.duo{display:flex;gap:var(--s3);}
+.dc{flex:1;min-width:0;padding:var(--s4) var(--s3);border-radius:var(--r-m);text-align:center;
+  background:var(--glass-1);border:var(--stroke);box-shadow:var(--sh-2);display:flex;flex-direction:column;}
+.dc .gr{width:var(--s7);height:var(--s7);margin:0 auto;border-radius:var(--r-m);display:grid;place-items:center;
+  font-family:'Graphik';font-weight:700;font-size:var(--f5);line-height:1;color:#2A1B00;
+  background:linear-gradient(150deg,#FFE9A8,#E7BC72);box-shadow:var(--sh-2), inset 0 2px 0 rgba(255,255,255,.5);}
+.dc h3{margin-top:var(--s2);font-family:'Handicrafts';font-weight:700;font-size:var(--f4);line-height:1.15;color:#fff;}
+.dc h3 span{display:block;margin-top:4px;font-family:'Graphik';font-weight:600;font-size:var(--f1);color:rgba(255,255,255,.55);direction:ltr;}
+.dc .kind{margin-top:var(--s2);font-weight:700;font-size:var(--f3);line-height:1.2;color:var(--teal);}
+.dc .temp{margin-top:var(--s3);padding:var(--s2);border-radius:var(--r-m);
+  background:linear-gradient(150deg,rgba(255,210,122,.16),rgba(255,210,122,.05));border:1.5px solid rgba(255,210,122,.40);}
+.dc .temp b{display:block;font-family:'Handicrafts';font-weight:700;font-size:var(--f6);line-height:1;color:var(--gold);direction:ltr;}
+.dc .temp span{display:block;margin-top:var(--s1);font-weight:600;font-size:var(--f1);color:rgba(255,255,255,.80);}
+.dc .use{margin-top:var(--s3);font-weight:500;font-size:var(--f2);line-height:1.5;color:rgba(255,255,255,.90);}
+.dc .use b{font-weight:700;color:var(--teal);}
+.dc .tag{margin-top:auto;padding-top:var(--s3);font-weight:600;font-size:var(--f1);color:rgba(255,255,255,.55);}
+
+/* ---------- شريحة اللزوجة وقوة الجل ---------- */
+.metrics{display:flex;gap:var(--s2);margin-top:var(--s3);}
+.mx{flex:1;padding:var(--s2) var(--s3);border-radius:var(--r-m);text-align:center;
+  background:linear-gradient(150deg,rgba(255,210,122,.16),rgba(255,210,122,.05));border:1.5px solid rgba(255,210,122,.40);}
+.mx b{display:block;font-family:'Graphik';font-weight:700;font-size:var(--f2);color:var(--gold);direction:ltr;}
+.mx span{display:block;margin-top:4px;font-weight:600;font-size:var(--f1);color:rgba(255,255,255,.85);}
+.mrow{display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s4);border-radius:var(--r-m);
+  background:var(--glass-1);border:var(--stroke);box-shadow:var(--sh-1);}
+.mrow .lv{flex:none;width:176px;text-align:center;}
+.mrow .lv b{display:block;font-family:'Handicrafts';font-weight:700;font-size:var(--f3);line-height:1.2;color:var(--gold);}
+.mrow .lv span{display:block;margin-top:4px;font-weight:600;font-size:var(--f1);color:rgba(255,255,255,.60);}
+.mrow .lv + .sep{flex:none;width:2px;align-self:stretch;background:rgba(255,255,255,.16);}
+.mrow p{flex:1;font-weight:500;font-size:var(--f2);line-height:1.5;color:#fff;}
+.mrow p b{font-weight:700;color:var(--teal);}
+.mrows{display:flex;flex-direction:column;gap:var(--s2);}
+
+/* ---------- ٣ أسئلة ---------- */
+.qs{display:flex;flex-direction:column;gap:var(--s3);}
+.qq{display:flex;align-items:center;gap:var(--s4);padding:var(--s4);border-radius:var(--r-m);
+  background:var(--glass-1);border:var(--stroke);box-shadow:var(--sh-1);}
+.qq .n{flex:none;width:var(--s7);height:var(--s7);border-radius:var(--r-m);display:grid;place-items:center;direction:ltr;
+  font-family:'Handicrafts';font-weight:700;font-size:var(--f5);color:#0F2150;
+  background:linear-gradient(150deg,#7FF0E2,#3FD4C2);box-shadow:var(--sh-2), inset 0 2px 0 rgba(255,255,255,.4);}
+.qq .tx{flex:1;}
+.qq .tx b{display:block;font-family:'Handicrafts';font-weight:700;font-size:var(--f4);line-height:1.2;color:#fff;}
+.qq .tx span{display:block;margin-top:var(--s1);font-weight:500;font-size:var(--f2);color:rgba(255,255,255,.72);}
+.say{padding:var(--s3) var(--s4);border-radius:var(--r-m);margin-bottom:var(--s4);font-weight:600;font-size:var(--f3);line-height:1.5;color:var(--alert);
+  background:rgba(255,138,138,.10);border:1.5px solid rgba(255,138,138,.34);text-align:center;}
+
+/* ضبط الخلوص */
+.qq{padding:var(--s3) var(--s4);}
+.qq .n{width:var(--s6);height:var(--s6);font-size:var(--f4);}
+.qq .tx b{font-size:var(--f3);}
+.say{padding:var(--s2) var(--s4);margin-bottom:var(--s3);font-size:var(--f2);}
+.qs{gap:var(--s2);}
+.mrow{padding:var(--s2) var(--s3);}
+.mrows{gap:var(--s1);}
+.metrics{margin-top:var(--s2);}
+.ty{padding:var(--s4);}
+.types{gap:var(--s4);}
+
+/* ================= v2 : صور حقيقية ================= */
+.shot{position:relative;flex:none;border-radius:var(--r-m);overflow:hidden;border:var(--stroke);box-shadow:var(--sh-2);background:rgba(255,255,255,.04);}
+.shot img{display:block;width:100%;height:100%;object-fit:cover;}
+.shot.s190{height:190px;} .shot.s220{height:220px;} .shot.s250{height:250px;}
+
+/* غلاف بصورة فوتوغرافية */
+.cover .photo{position:absolute;inset:0 0 auto 0;height:640px;overflow:hidden;z-index:0;
+  -webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 58%,transparent 100%);
+          mask-image:linear-gradient(to bottom,#000 0%,#000 58%,transparent 100%);}
+.cover .photo img{position:absolute;left:0;top:-215px;width:1080px;height:auto;filter:brightness(.82) saturate(.95) contrast(1.04);}
+.cover .photo::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(10,22,66,.55) 0%,rgba(10,22,66,.12) 30%,rgba(10,22,66,0) 55%);}
+.cta .photo{position:absolute;inset:0 0 auto 0;height:var(--cta-slot);overflow:hidden;z-index:0;
+  -webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 52%,transparent 100%);
+          mask-image:linear-gradient(to bottom,#000 0%,#000 52%,transparent 100%);}
+.cta .photo img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 30%;filter:brightness(.55) saturate(.9) contrast(1.08);}
+.cta .photo::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(10,22,66,.5),rgba(10,22,66,.1) 40%,rgba(10,22,66,.0));}
+
+/* ضغط البطاقات علشان الصورة تاخد مكانها */
+.cmp .stps{gap:var(--s2);}
+.cmp .stp{padding:var(--s2) var(--s3);gap:var(--s3);}
+.cmp .stp .n{width:var(--s6);height:var(--s6);}
+.cmp .stp .n svg{width:36px;height:36px;}
+.cmp .stp .tx b{font-size:var(--f2);}
+.cmp .stp .tx p{font-size:var(--f1);margin-top:4px;}
+.cmp .bar{margin-top:var(--s2);padding:var(--s2) var(--s3);font-size:var(--f1);}
+.cmp .shot{margin-top:var(--s3);margin-bottom:var(--s2);}
+.cmp .types{gap:var(--s2);}
+.cmp .ty{padding:var(--s2) var(--s3);}
+.cmp .ty .gr{width:var(--s6);height:var(--s6);font-size:var(--f4);}
+.cmp .ty .tx b{font-size:var(--f3);}
+.cmp .ty .tx p{font-size:var(--f1);}
+.cmp .mt .bars i{height:26px;}
+.cmp .dc{padding:var(--s3) var(--s2);}
+.cmp .dc .gr{width:var(--s6);height:var(--s6);font-size:var(--f4);}
+.cmp .dc h3{font-size:var(--f3);margin-top:var(--s1);}
+.cmp .dc .kind{font-size:var(--f2);margin-top:var(--s1);}
+.cmp .dc .temp{margin-top:var(--s2);padding:var(--s1);}
+.cmp .dc .temp b{font-size:var(--f5);}
+.cmp .dc .use{margin-top:var(--s2);font-size:var(--f1);line-height:1.5;}
+.cmp .mrow{padding:var(--s2) var(--s3);}
+.cmp .mrow p{font-size:var(--f1);line-height:1.45;}
+.cmp .mrow .lv{width:160px;} .cmp .mrow .lv b{font-size:var(--f2);}
+.cmp .metrics{margin-top:var(--s2);}
+.cmp .mx{padding:var(--s1) var(--s2);}
+.cmp .mx b{font-size:var(--f1);} .cmp .mx span{font-size:18px;margin-top:0;}
+.split{display:flex;gap:var(--s3);margin-top:var(--s3);align-items:stretch;}
+.split .shot{flex:1;margin:0;height:auto;}
+.split .pts{flex:1.2;gap:var(--s2);}
+.split .pt{padding:var(--s2) var(--s3);} .split .pt p{font-size:var(--f2);}
+.split .pt i{width:var(--s5);height:var(--s5);font-size:var(--f2);}
+.cmp .dgm{margin-top:var(--s2);}
+.cover .swipe{z-index:3;}
+.cover .photo{-webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 40%,transparent 100%);mask-image:linear-gradient(to bottom,#000 0%,#000 40%,transparent 100%);}
+.cmp .shot.s250{height:250px;} .cmp .shot.s280{height:280px;}
+.cover .photo{height:610px;}
+.cover .photo img{top:-190px;}
+
+/* ================= v2b : صور بملء الشريحة بدون حدود ================= */
+.fb .ph{position:absolute;inset:0;overflow:hidden;z-index:0;}
+.fb .ph img{position:absolute;height:auto;max-width:none;filter:brightness(.9) saturate(.95) contrast(1.04);}
+.fb .fade{position:absolute;inset:0;z-index:1;
+  background:linear-gradient(to bottom,rgba(14,24,70,0) 0%,rgba(14,24,70,0) 28%,rgba(14,24,70,.55) 44%,rgba(16,26,76,.86) 58%,rgba(18,27,82,.96) 72%,#121B52 100%);}
+.fb .scrim-top{z-index:1;height:230px;}
+.fb .brand,.fb .stitle{z-index:3;}
+.fb .rule,.fb .pager,.fb .tagline{z-index:3;}
+.fb .wrap{top:auto;bottom:var(--wrap-bot);z-index:2;justify-content:flex-end;}
+.fb .wrap .h2{margin-bottom:var(--s3);text-shadow:0 3px 14px rgba(4,10,40,.85),0 10px 34px rgba(4,10,40,.6);}
+.fb .stps .stp,.fb .ty,.fb .dc,.fb .mrow,.fb .dgm,.fb .pt,.fb .mx{
+  background:linear-gradient(150deg,rgba(255,255,255,.14),rgba(255,255,255,.06));
+  }
+.fb .dgm{margin-top:0;}
+.fb .dgm svg{width:100%;height:auto;display:block;}
+.fb .pts.row{flex-direction:row;margin-top:var(--s2);gap:var(--s2);}
+.fb .pts.row .pt{flex:1;padding:var(--s2);gap:var(--s2);justify-content:flex-start;}
+.fb .pts.row .pt p{font-size:var(--f2);}
+.fb .pts.row .pt i{width:var(--s5);height:var(--s5);font-size:var(--f2);}
+.fb .metrics{margin-top:0;margin-bottom:var(--s2);}
+.fb .mrows{gap:var(--s1);}
+.cta.fb .body{z-index:2;top:470px;}
+.cta.fb .foot{z-index:2;}
+.cta.fb .brand{z-index:3;}

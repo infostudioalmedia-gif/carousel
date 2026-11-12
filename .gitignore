@@ -1,0 +1,16 @@
+jobs/
+*.log
+chk*.png
+_*.json
+_*.txt
+__pycache__/
+*.pyc
+app/selftest_report.txt
+# خطوط مرخّصة (Graphik / ArbFONTS) — ما تتنشرش في ريبو عام
+**/fonts/
+*.ttf
+*.otf
+.env
+*.env
+app/.llm_*
+app/config.json

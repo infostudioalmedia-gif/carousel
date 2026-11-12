@@ -1,0 +1,324 @@
+/* ============================================================
+   رؤية — مكوّنات الكاروسيل المشتركة  v2
+   كل حاجة بتتكرر بين الحلقات موجودة هنا.
+   ملف الحلقة مايحتوش غير اللي فريد ليها.
+   كل رقم من v2-tokens.css — مفيش قيم حرة.
+   ============================================================ */
+
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#000;font-family:'Graphik',sans-serif;
+     -webkit-font-smoothing:antialiased;text-rendering:geometricPrecision;}
+
+.slide{position:relative;width:1080px;height:1350px;overflow:hidden;
+       direction:rtl;color:#fff;}
+
+/* ============================================================
+   الأرضية والأثاث
+   ============================================================ */
+.bg{position:absolute;inset:0;
+  background:
+    radial-gradient(86% 56% at 100% 0%,  rgba(118,190,236,.52), transparent 62%),
+    radial-gradient(78% 50% at -4% 100%, rgba(64,158,214,.44),  transparent 60%),
+    radial-gradient(64% 40% at 60% 44%,  rgba(88,150,214,.18),  transparent 70%),
+    linear-gradient(162deg,#35619E 0%,#24397D 34%,#192767 66%,#121B52 100%);}
+.dots{position:absolute;inset:0;opacity:.14;
+  background-image:radial-gradient(rgba(255,255,255,.95) 1.1px,transparent 1.2px);
+  background-size:var(--s3) var(--s3);
+  -webkit-mask-image:linear-gradient(145deg,rgba(0,0,0,.30) 0%,rgba(0,0,0,1) 52%,rgba(0,0,0,.40) 100%);}
+
+.brand{position:absolute;top:var(--logo-top);right:var(--m);height:var(--logo-h);display:block;}
+.stitle{position:absolute;top:calc(var(--logo-top) + var(--s1));left:var(--m);
+  font-weight:600;font-size:var(--f1);color:rgba(255,255,255,.66);}
+.rule{position:absolute;left:var(--m);right:var(--m);bottom:var(--rule-bot);height:1px;
+  background:linear-gradient(to left,rgba(255,255,255,0),rgba(255,255,255,.32),rgba(255,255,255,0));}
+.pager{position:absolute;bottom:var(--foot-bot);left:var(--m);direction:ltr;
+  font-weight:600;font-size:var(--f1);letter-spacing:2.4px;color:rgba(255,255,255,.46);}
+.tagline{position:absolute;bottom:var(--foot-bot);right:var(--m);
+  font-weight:500;font-size:var(--f1);color:rgba(255,255,255,.44);}
+
+.wrap{position:absolute;right:var(--m);left:var(--m);
+  top:var(--wrap-top);bottom:var(--wrap-bot);display:flex;flex-direction:column;}
+.mid{flex:1;display:flex;flex-direction:column;justify-content:center;}
+
+/* ============================================================
+   الطباعة
+   ============================================================ */
+.h1{font-family:'Handicrafts';font-weight:700;font-size:var(--f7);
+    line-height:var(--lh-h1);text-align:right;
+    text-shadow:0 14px 40px rgba(0,0,0,.34);}
+.h2{font-family:'Handicrafts';font-weight:700;font-size:var(--f5);
+    line-height:var(--lh-h2);text-align:right;
+    text-shadow:0 10px 30px rgba(0,0,0,.28);}
+.h1 .ac,.h2 .ac{color:var(--teal);}
+.h2.c{text-align:center;}
+.dn1{margin-top:var(--s5);}          /* إزاحة «1 سم» */
+
+.lede{font-weight:400;font-size:var(--f2);line-height:var(--lh-body);
+  text-align:right;color:rgba(255,255,255,.86);}
+.lede b{font-weight:600;color:#fff;}
+.src{margin-top:var(--s3);font-weight:500;font-size:var(--f1);
+  color:rgba(255,255,255,.44);line-height:var(--lh-body);}
+
+.ctr .lede,.ctr .src,.ctr .myth{text-align:center;}
+.ctr .cost{justify-content:center;}
+.ctr .cost span{flex:0 1 auto;text-align:right;}
+
+/* ============================================================
+   الصور
+   ============================================================ */
+.slot{position:relative;overflow:hidden;background:rgba(255,255,255,.035);
+  border-radius:var(--r-m);}
+.slot img{display:block;width:100%;height:100%;object-fit:cover;}
+.slot--strip{width:100%;border:var(--stroke);box-shadow:var(--sh-2);
+  margin-bottom:var(--s4);}
+
+/* ------------------------------------------------------------
+   صورة بعرض الشاشة بحواف متلاشية (feather)
+   بتكسر عمود المحتوى وبتندمج في الخلفية من غير إطار،
+   والنص بيركب على حافتها المتلاشية.
+   ------------------------------------------------------------ */
+/* صورة داخلية بنفس نظام الغلاف: من حافة الشاشة، والكلام فوقها */
+.slot--hero{position:absolute;inset:0 0 auto 0;z-index:0;
+  width:auto;height:var(--hero-line);margin:0;
+  border:0;border-radius:0;box-shadow:none;background:transparent;overflow:hidden;
+  -webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 58%,transparent 100%);
+          mask-image:linear-gradient(to bottom,#000 0%,#000 58%,transparent 100%);
+  -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;}
+.hero .wrap{top:var(--hero-text);z-index:2;}
+/* عنوان الشريحة الداخلية: في منطقة الهيدر فوق الصورة */
+.hero > .h2{position:absolute;right:var(--m);left:var(--m);
+  top:var(--hero-head);margin:0;z-index:3;
+  text-shadow:0 2px 12px rgba(6,14,40,.72), 0 6px 34px rgba(6,14,40,.55);}
+.hero .stitle,.hero .brand{z-index:3;}
+.slot--bleed{
+
+  position:relative;width:auto;
+  margin-inline:calc(-1 * var(--m));
+  margin-block:calc(-1 * var(--s3)) calc(-1 * var(--s5));
+  border:0;border-radius:0;box-shadow:none;background:transparent;
+  /* نفس منطق الغلاف: عرض كامل من الحافة للحافة، والتلاشي رأسي فقط */
+  -webkit-mask-image:linear-gradient(to bottom,
+      transparent 0%, #000 17%, #000 78%, transparent 100%);
+          mask-image:linear-gradient(to bottom,
+      transparent 0%, #000 17%, #000 78%, transparent 100%);
+  -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;}
+.slot--bleed img{filter:saturate(.92) contrast(1.04);}
+/* الغلاف ينتهي عند القطع الذهبي */
+.slot--cover{position:absolute;inset:0 0 auto 0;height:var(--phi-line);border-radius:0;}
+/* الصورة العلوية بتتلاشى في الخلفية بدل ما تتغطى بحجاب معتم —
+   وده بيمنع ظهور أي حافة أفقية عند نهايتها. */
+.slot--cover,.cta .slot--cta{
+  -webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 56%,transparent 100%);
+          mask-image:linear-gradient(to bottom,#000 0%,#000 56%,transparent 100%);
+  -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;}
+.scrim-top{position:absolute;left:0;right:0;top:0;height:220px;
+  background:linear-gradient(to bottom,rgba(6,12,38,.62),rgba(6,12,38,0));}
+.scrim-bot{position:absolute;left:0;right:0;bottom:0;height:420px;
+  background:linear-gradient(to bottom,
+    rgba(8,16,46,0) 0%, rgba(8,16,46,.46) 42%,
+    rgba(8,16,46,.62) 72%, rgba(8,16,46,0) 100%);}
+
+/* ============================================================
+   شريحة الغلاف
+   ============================================================ */
+.cover .block{position:absolute;right:var(--m);left:var(--m);top:var(--cover-top);}
+.quote{margin-top:var(--s5);padding:var(--s4) var(--s5) var(--s4) var(--s4);
+  border-radius:var(--r-m);border-right:4px solid var(--teal);
+  background:var(--glass-1);
+  font-weight:500;font-size:var(--f2);line-height:var(--lh-body);
+  color:rgba(255,255,255,.94);}
+.seq{position:absolute;right:var(--m);bottom:var(--s7);
+  display:flex;flex-direction:column;gap:var(--s2);}
+.seqbar{display:flex;gap:var(--s1);}
+.seqbar i{display:block;width:var(--s5);height:var(--s1);border-radius:var(--r-s);
+  background:rgba(255,255,255,.22);}
+.seqbar i.on{background:var(--teal);box-shadow:0 0 16px rgba(79,230,213,.55);}
+.seqlab{font-weight:600;font-size:var(--f1);color:rgba(255,255,255,.62);}
+.swipe{position:absolute;left:var(--m);bottom:var(--s7);
+  display:flex;align-items:center;gap:var(--s2);
+  font-weight:600;font-size:var(--f2);color:var(--teal);}
+
+/* ============================================================
+   بلوكات محتوى قابلة لإعادة الاستخدام
+   ============================================================ */
+/* بلوك مميّز — للنص المقتبس من المصدر */
+.qbox{padding:var(--s4) var(--s5);border-radius:var(--r-m);
+  background:linear-gradient(150deg,rgba(79,230,213,.20),rgba(79,230,213,.06));
+  border:2px solid rgba(79,230,213,.48);
+  box-shadow:var(--sh-2), inset 0 1.5px 0 rgba(255,255,255,.28);}
+.qbox p{font-weight:500;font-size:var(--f3);line-height:1.55;color:#fff;}
+.qbox p b{font-weight:700;color:var(--teal);}
+
+/* بطاقات أيقونة + كلمة */
+.pairs{display:flex;gap:var(--s2);margin-top:var(--s4);}
+.pair{flex:1;padding:var(--s3);border-radius:var(--r-m);text-align:center;
+  background:var(--glass-2);border:var(--stroke);}
+.pair b{display:block;font-size:var(--f4);line-height:1.1;}
+.pair span{display:block;margin-top:var(--s2);
+  font-weight:500;font-size:var(--f2);color:rgba(255,255,255,.80);}
+
+/* بطاقات أرقام ذهبية */
+.figs{display:flex;gap:var(--s2);}
+.fig{flex:1;padding:var(--s3);border-radius:var(--r-m);text-align:center;
+  background:linear-gradient(150deg,rgba(255,210,122,.16),rgba(255,210,122,.05));
+  border:1.5px solid rgba(255,210,122,.40);}
+.fig b{display:block;font-family:'Handicrafts';font-weight:700;
+  font-size:var(--f6);line-height:1;color:var(--gold);direction:ltr;}
+.fig span{display:block;margin-top:var(--s2);
+  font-weight:600;font-size:var(--f1);line-height:1.5;color:rgba(255,255,255,.88);}
+.fig span i{font-style:normal;font-weight:400;color:rgba(255,255,255,.58);}
+
+/* اعتقاد خاطئ — شريط أحمر */
+.myth{margin-bottom:var(--s4);padding:var(--s3) var(--s4);border-radius:var(--r-m);
+  font-weight:600;font-size:var(--f2);line-height:1.5;color:var(--alert);
+  background:rgba(255,138,138,.10);border:1.5px solid rgba(255,138,138,.34);}
+
+/* بطاقات تحذير / تكاليف */
+.costs{display:flex;flex-direction:column;gap:var(--s2);}
+.cost{display:flex;align-items:center;gap:var(--s3);
+  padding:var(--s3) var(--s4);border-radius:var(--r-m);
+  background:linear-gradient(150deg,rgba(255,138,138,.18),rgba(255,138,138,.05));
+  border:1.5px solid rgba(255,138,138,.42);}
+.cost em{flex:none;font-style:normal;font-size:var(--f3);line-height:1;}
+.cost span{flex:1;font-weight:500;font-size:var(--f2);line-height:1.45;color:#fff;}
+
+/* صفوف مرقّمة */
+.steps{display:flex;flex-direction:column;gap:var(--s2);}
+.step{display:flex;align-items:center;gap:var(--s3);
+  padding:var(--s3) var(--s4);border-radius:var(--r-m);
+  background:var(--glass-1);border:var(--stroke);}
+.step .n{flex:none;width:var(--s7);height:var(--s7);border-radius:var(--r-m);
+  display:grid;place-items:center;direction:ltr;
+  font-family:'Handicrafts';font-weight:700;font-size:var(--f4);color:#0F2150;
+  background:linear-gradient(150deg,#7FF0E2,#3FD4C2);
+  box-shadow:var(--sh-2), inset 0 2px 0 rgba(255,255,255,.4);}
+.step .tx{flex:1;}
+.step .tx b{display:block;font-family:'Graphik';font-weight:700;font-size:var(--f3);
+  color:var(--teal);direction:ltr;text-align:right;}
+.step .tx span{display:block;margin-top:var(--s1);
+  font-weight:400;font-size:var(--f2);line-height:1.45;color:rgba(255,255,255,.88);}
+
+/* ============================================================
+   شريحة التعليقات — واجهة فيسبوك
+   ============================================================ */
+.fb{background:#fff;border-radius:var(--r-m);
+  padding:var(--s3) var(--s4) var(--s4);box-shadow:var(--sh-3);}
+.fb-sort{display:flex;align-items:center;gap:var(--s1);margin-bottom:var(--s2);
+  font-family:'Graphik';font-weight:600;font-size:var(--f1);color:#65676B;}
+.fb-sort svg{width:13px;height:9px;}
+.fb-row{display:flex;align-items:flex-start;gap:var(--s2);}
+.fb-av{flex:none;width:var(--s7);height:var(--s7);border-radius:var(--r-f);display:block;}
+.fb-av--you{background:#D8DCE1;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06);}
+.fb-col{flex:1;min-width:0;}
+.fb-bub{background:#F0F2F5;border-radius:var(--r-m);
+  padding:var(--s2) var(--s3);display:inline-block;max-width:100%;}
+.fb-name{display:flex;align-items:center;gap:var(--s1);
+  font-family:'Graphik';font-weight:700;font-size:var(--f2);color:#050505;line-height:1.3;}
+.fb-vf{width:26px;height:26px;flex:none;}
+.fb-txt{margin-top:var(--s1);font-family:'Graphik';font-weight:400;
+  font-size:var(--f2);line-height:1.45;color:#050505;}
+.fb-txt b{font-weight:700;}
+.fb-act{display:flex;align-items:center;gap:var(--s2);
+  margin:var(--s2) var(--s3) 0;font-family:'Graphik';font-size:var(--f1);color:#65676B;}
+.fb-act i{font-style:normal;color:#8A8D91;}
+.fb-b{font-weight:600;color:#65676B;}
+.fb-t{color:#8A8D91;}
+.fb-rx{margin-inline-start:auto;display:flex;align-items:center;
+  background:#fff;border-radius:var(--r-f);padding:3px 10px 3px 4px;
+  box-shadow:0 1px 3px rgba(0,0,0,.22);}
+.fb-rx .rx{width:26px;height:26px;display:block;}
+.fb-rx .rx.love{margin-inline-start:-7px;}
+.fb-rx b{font-family:'Graphik';font-weight:500;font-size:var(--f1);
+  color:#65676B;margin-inline-start:var(--s1);}
+.fb-input{margin-top:var(--s3);align-items:center;}
+.fb-field{flex:1;display:flex;align-items:center;gap:var(--s2);
+  background:#F0F2F5;border-radius:var(--r-f);padding:var(--s2) var(--s3);}
+.fb-field span{flex:1;font-family:'Graphik';font-weight:400;
+  font-size:var(--f2);color:#65676B;}
+.fb-em{width:28px;height:28px;flex:none;}
+
+/* الكلمة البطل — ذهبية بوهج ذهبي */
+.freeline{margin-top:var(--s5);display:flex;align-items:center;justify-content:center;
+  gap:var(--s3);flex-wrap:wrap;
+  font-weight:600;font-size:var(--f3);color:rgba(255,255,255,.94);}
+.free{font-family:'Handicrafts';font-weight:700;font-size:var(--f7);line-height:1;
+  display:inline-block;color:#FFEFC2;
+  text-shadow:
+    0 2px 0 #EFC066, 0 4px 0 #D9A23F, 0 6px 0 #BE8624, 0 8px 0 #9C6B15,
+    0 0 30px rgba(255,203,102,.85),
+    0 0 64px rgba(255,178,50,.55),
+    0 0 110px rgba(255,150,20,.30),
+    0 20px 30px rgba(48,26,0,.55);}
+
+/* ============================================================
+   شريحة الـCTA — التخطيط محسوب للخلوص
+   صورة 256 · جسم 464 · نهاية المحتوى 1045 · الفوتر 1118  ← خلوص 73px
+   ============================================================ */
+/* صورة الـCTA — نفس نظام الغلاف: عرض كامل من فوق + حجابين */
+.cta .slot--cta{position:absolute;inset:0 0 auto 0;height:var(--cta-slot);
+  border:0;border-radius:0;box-shadow:none;}
+.cta .body{position:absolute;right:var(--m);left:var(--m);top:var(--cta-body);}
+.eyebrow{display:inline-block;font-weight:700;font-size:var(--f1);letter-spacing:.06em;
+  color:#04231F;background:var(--teal);padding:var(--s1) var(--s3);border-radius:var(--r-f);}
+.cta .h2{margin-top:var(--s3);}
+.cta .lede{margin-top:var(--s3);}
+.offers{margin-top:var(--s4);}
+.offer{display:flex;align-items:center;gap:var(--s3);
+  padding:var(--s4);border-radius:var(--r-m);
+  background:var(--glass-1);border:var(--stroke);box-shadow:var(--sh-1);}
+.oic{flex:none;width:var(--s7);height:var(--s7);border-radius:var(--r-m);
+  display:grid;place-items:center;
+  background:linear-gradient(150deg,rgba(255,255,255,.22),rgba(255,255,255,.07));
+  border:1.5px solid rgba(255,255,255,.28);
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.34), var(--sh-1);}
+.oic svg{width:var(--s6);height:var(--s6);display:block;
+  filter:drop-shadow(0 3px 5px rgba(3,10,36,.5));}
+.otx{flex:1;direction:rtl;}
+.otx b{display:block;font-weight:700;font-size:var(--f3);color:#fff;}
+.otx .osub{display:block;margin-top:var(--s1);
+  font-weight:400;font-size:var(--f2);line-height:1.4;color:rgba(255,255,255,.76);}
+/* قاعدة السيستم: ممنوع أي رابط على الشرائح.
+   الرابط بيتبعت على الخاص للي بيعلّق بس. */
+.otx .how{display:block;margin-top:var(--s2);
+  font-weight:700;font-size:var(--f2);color:var(--teal);}
+
+.foot{position:absolute;right:var(--m);left:var(--m);bottom:var(--s7);
+  display:flex;flex-direction:row-reverse;align-items:center;
+  justify-content:space-between;gap:var(--s3);
+  padding-top:var(--s3);border-top:1px solid rgba(255,255,255,.16);}
+.foot .qr{flex:none;width:var(--qr);height:var(--qr);border-radius:var(--r-s);
+  background:#fff;padding:var(--s1);}
+.foot .qr img{width:100%;height:100%;display:block;}
+.foot .who{flex:1;text-align:right;}
+.foot .who img{height:var(--logo-h);display:block;margin-left:auto;margin-right:0;}
+.foot .who p{margin-top:var(--s2);font-weight:500;font-size:var(--f1);
+  line-height:1.5;color:rgba(255,255,255,.60);}
+
+/* نصوص المخططات لاتينية — لازم LTR وإلا بتتقص في سياق RTL */
+.dgm svg text{direction:ltr;unicode-bidi:isolate;}
+.dgm svg text.ar{direction:rtl;font-family:'Graphik';font-weight:600;}
+
+/* علامات أماكن الصور قبل التوليد — تختفي بشيل show-slots من <body> */
+body.show-slots .slot[data-file]{outline:2px dashed rgba(79,230,213,.45);outline-offset:-2px;}
+body.show-slots .slot[data-file]::after{content:attr(data-file);position:absolute;
+  left:50%;top:52%;transform:translate(-50%,-50%);direction:ltr;z-index:5;
+  font-family:'Graphik';font-weight:600;font-size:21px;letter-spacing:.4px;
+  color:rgba(79,230,213,.85);white-space:nowrap;
+  background:rgba(8,16,44,.62);padding:11px 20px;border-radius:12px;}
+
+/* أيقونات مجسّمة — تحل محل الإيموچي */
+.i3d{width:var(--s7);height:var(--s7);display:block;margin:0 auto;
+  filter:drop-shadow(0 6px 11px rgba(3,10,36,.55));}
+.lv i .i3d{margin:0;}
+.prm b,.pair b{line-height:0;}
+
+/* ---- شريحة إحصائية (مشتركة بين الحلقات) ---- */
+.chip{flex:1;min-width:0;padding:var(--s2) var(--s3);border-radius:var(--r-s);
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);
+  text-align:center;}
+.chip u{display:block;text-decoration:none;font-weight:600;font-size:var(--f1);
+  color:rgba(255,255,255,.55);}
+.chip b{display:block;margin-top:var(--s1);font-family:'Handicrafts';font-weight:700;
+  font-size:var(--f3);color:var(--gold);direction:ltr;}
+.chip.wide{flex:2;}
+.chip.wide b{font-family:'Graphik';font-size:var(--f2);color:#fff;direction:rtl;}
